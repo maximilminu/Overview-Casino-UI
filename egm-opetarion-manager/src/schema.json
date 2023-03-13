@@ -1,0 +1,22 @@
+{
+	"type": "object",
+	"properties": {
+		"Barcode": {
+			"title": "Nombre",
+			"type": "number",
+			"description": "Últimos 5 dígitos"
+		},
+		"Date": {
+			"title": "Fecha y hora",
+			"type": "string"
+		},
+		"Amount": {
+			"title": "Apellido",
+			"type": "number"
+		},
+		"MachineID": {
+			"type": "string",
+			"enum": []
+		}
+	}
+}

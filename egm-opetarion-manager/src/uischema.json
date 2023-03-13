@@ -1,0 +1,34 @@
+{
+	"type": "HorizontalLayout",
+	"elements": [
+		{
+			"type": "Control",
+			"scope": "#/properties/MachineID",
+			"options": {
+				"autocomplete": true
+			}
+		},
+		{
+			"type": "Control",
+			"label": "Número de Ticket",
+			"scope": "#/properties/Barcode",
+			"autocomplete": "off"
+		},
+
+		{
+			"type": "Control",
+			"label": "Monto",
+			"scope": "#/properties/Amount"
+		},
+		{
+			"type": "Control",
+			"label": "Fecha y Hora",
+			"scope": "#/properties/Date",
+			"options": {
+				"format": "date-time",
+
+				"ampm": true
+			}
+		}
+	]
+}
