@@ -1,0 +1,64 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Control",
+      "label": "Avatar",
+      "scope": "#/properties/Avatar"
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "Nombre",
+          "scope": "#/properties/Name"
+        },
+        {
+          "type": "Control",
+          "label": "Apellido",
+          "scope": "#/properties/Lastname"
+        }
+      ]
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "DNI",
+          "scope": "#/properties/LegalID"
+        },
+        {
+          "type": "Control",
+          "label": "Cumpleaños",
+          "scope": "#/properties/Birthdate",
+          "options": {
+            "dateFormat": "DD/MM/YYYY",
+            "format": "date"
+          }
+        }
+      ]
+    },
+    {
+      "type": "VerticalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "Email",
+          "scope": "#/properties/Email"
+        },
+        {
+          "type": "Control",
+          "label": "Area",
+          "scope": "#/properties/Area"
+        },
+        {
+          "type": "Control",
+          "label": "Medios de Contacto",
+          "scope": "#/properties/ContactMethods"
+        }
+      ]
+    }
+  ]
+}
