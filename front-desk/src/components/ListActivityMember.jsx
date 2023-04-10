@@ -10,6 +10,7 @@ import {
   Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import DescribeText from "./DescribeText";
 
 const style = {
   tableCell: {
@@ -19,12 +20,7 @@ const style = {
     margin: "0 auto",
   },
   typography: {
-    fontWeight: "700",
-    fontSize: "12px",
-    marginLeft: "25px",
-    marginBottom: "10px",
-    color: "rgb(123, 128, 154)",
-    textTransform: "uppercase",
+    fontSize: 14,
   },
 };
 
@@ -45,10 +41,10 @@ const ListActivityMember = ({ visits }) => {
       component={Paper}
       sx={{
         overflow: "auto",
-        height: { xl: 650, lg: 650, md: 700 },
+        height: "95%",
       }}
     >
-      <Table sx={{ minWidth: 650 }} stickyHeader aria-label="sticky table">
+      <Table sx={{ minWidth: 650 }} stickyHeader size="small">
         <TableHead>
           <TableRow>
             <StyledTableCell align="left" sx={style.tableCell}>
@@ -81,13 +77,20 @@ const ListActivityMember = ({ visits }) => {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell align="left" component="th" scope="row">
-                {new Date(visit.CreatedAt).toLocaleString().split(",")}
+                {new Date(visit.CreatedAt).toLocaleString("es-AR").split(",")}
               </TableCell>
               <TableCell align="center">Check-In</TableCell>
               <TableCell align="center">
-                Origen : {visit?.AreaID.slice(20, -1)} <br />
-                Responsable: {visit.ID.slice(20, -1)}
-                <br />
+                <DescribeText
+                  ID={visit.UserID}
+                  preFixApi={"user"}
+                  style={style.typography}
+                />
+                <DescribeText
+                  ID={visit.NetworkDeviceID}
+                  preFixApi={"network-device"}
+                  style={style.typography}
+                />
               </TableCell>
             </TableRow>
           ))}

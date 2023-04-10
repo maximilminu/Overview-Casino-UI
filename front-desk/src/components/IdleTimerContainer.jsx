@@ -7,9 +7,7 @@ function IdleTimerContainer() {
     // Fire a Modal Prompt
   };
 
-  const onIdle = () => {
-    
-  };
+  const onIdle = () => {};
 
   const onActive = (event) => {
     // Close Modal Prompt

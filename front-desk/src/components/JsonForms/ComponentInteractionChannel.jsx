@@ -22,14 +22,14 @@ import { TYPING_DEBOUNCE } from "../../constants";
 const renderer = withJsonFormsDispatchCellProps(
   withJsonFormsLayoutProps(({ schema, data, path, handleChange }) => {
     if (data.Type === "phone") {
-      if (data.Data?.IsMobile) {
+      if (data.Value?.IsMobile) {
         data.Type = "cellphone";
       } else {
         data.Type = "landphone";
       }
     }
 
-    const [media, setMedia] = useState(data.Type || "cellphone");
+    const [media, setMedia] = useState(data?.Type || "cellphone");
     const [mediaData, setMediaData] = useState(data.Value || "");
     // eslint-disable-next-line
     const changeDebounced = useCallback(
@@ -185,7 +185,7 @@ const renderer = withJsonFormsDispatchCellProps(
             <>
               <TextField
                 autoComplete="off"
-                label={"DDN"}
+                label={"Área"}
                 value={mediaData.Region}
                 variant="standard"
                 onChange={handleMediaDataChangeRegion}
@@ -203,7 +203,10 @@ const renderer = withJsonFormsDispatchCellProps(
                 onChange={handleMediaDataChangeNumber}
                 margin="dense"
                 required={true}
-                InputProps={{ style: { fontSize: 12, width: 200 } }}
+                sx={{ marginLeft: "25px" }}
+                InputProps={{
+                  style: { fontSize: 12, width: 180 },
+                }}
               />
             </>
           ) : (
@@ -215,7 +218,7 @@ const renderer = withJsonFormsDispatchCellProps(
               onChange={(ev) => setMediaData(ev.target.value)}
               margin="dense"
               required={true}
-              InputProps={{ style: { fontSize: 12, width: 240 } }}
+              InputProps={{ style: { fontSize: 12, width: 245 } }}
             />
           )}
         </Box>

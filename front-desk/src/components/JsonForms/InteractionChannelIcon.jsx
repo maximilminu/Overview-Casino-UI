@@ -13,20 +13,27 @@ import { memo } from "react";
 const InteractionChannelIcon = memo((props) => {
   const media =
     (props["interaction-channel"] && props["interaction-channel"].Media) ||
+    props.media?.Type ||
     props.media;
+  const mobile = props.media?.Value?.IsMobile;
   const isMobile =
     props["interaction-channel"] && props["interaction-channel"].Data
       ? props["interaction-channel"].Data.IsMobile
-      : props.mobile;
+      : props?.mobile;
+
   switch (media) {
     case "phone":
-      if (isMobile) {
+      if (mobile || isMobile) {
         return <PhoneAndroid {...props} />;
       } else {
         return <Phone {...props} />;
       }
     case "landphone":
-      return <Phone {...props} />;
+      if (mobile) {
+        return <PhoneAndroid {...props} />;
+      } else {
+        return <Phone {...props} />;
+      }
     case "cellphone":
       return <PhoneAndroid {...props} />;
     case "Messenger":

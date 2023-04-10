@@ -18,25 +18,17 @@ const ConfirmDialog = React.memo(
         aria-labelledby="alert-dialog-confirmdelete-title"
         aria-describedby="alert-dialog-confirmdelete-description"
       >
-        <DialogTitle
-          sx={{ color: "primary.main" }}
-          id="alert-dialog-confirmdelete-title"
-        >
-          <strong>{title}</strong>
-        </DialogTitle>
+        <DialogTitle sx={{ color: "black" }}>{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText
-            sx={{ color: "primary.main" }}
-            id="alert-dialog-confirmdelete-description"
-          >
+          <DialogContentText sx={{ color: "primary.main" }}>
             {content}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onCancel} color="primary">
+          <Button onClick={onClose} sx={{ color: "secondary.main" }}>
             No, cancelar.
           </Button>
-          <Button onClick={onConfirm} color="warning">
+          <Button onClick={onConfirm} variant="contained">
             ¡Sí, proceder!
           </Button>
         </DialogActions>

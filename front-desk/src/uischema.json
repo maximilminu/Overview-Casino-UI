@@ -11,13 +11,15 @@
       "elements": [
         {
           "type": "Control",
-          "label": "Nombre",
-          "scope": "#/properties/Name"
+          "label": "",
+          "scope": "#/properties/Name",
+          "otherLabel": "Nombre *"
         },
         {
           "type": "Control",
-          "label": "Apellido",
-          "scope": "#/properties/Lastname"
+          "label": "",
+          "scope": "#/properties/Lastname",
+          "otherLabel": "Apellido *"
         }
       ]
     },
@@ -26,12 +28,13 @@
       "elements": [
         {
           "type": "Control",
-          "label": "DNI",
-          "scope": "#/properties/LegalID"
+          "label": "",
+          "scope": "#/properties/LegalID",
+          "otherLabel": "DNI *"
         },
         {
           "type": "Control",
-          "label": "Cumpleaños",
+          "label": "Fecha de nacimiento *",
           "scope": "#/properties/Birthdate",
           "options": {
             "dateFormat": "DD/MM/YYYY",
@@ -41,18 +44,81 @@
       ]
     },
     {
-      "type": "VerticalLayout",
+      "type": "HorizontalLayout",
       "elements": [
         {
           "type": "Control",
-          "label": "Email",
-          "scope": "#/properties/Email"
+          "label": "",
+          "scope": "#/properties/Email",
+          "otherLabel": "Email *"
+        },
+
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Line1",
+          "otherLabel": "Direccion *"
+        }
+      ]
+    },
+
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Line2",
+          "otherLabel": "Dirección 2 *"
         },
         {
           "type": "Control",
-          "label": "Area",
-          "scope": "#/properties/Area"
+          "label": "",
+          "scope": "#/properties/Zip",
+          "otherLabel": "Código Postal *"
+        }
+      ]
+    },
+
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Area",
+          "otherLabel": "Zona *"
         },
+
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Location",
+          "otherLabel": "Ciudad *"
+        }
+      ]
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Region",
+          "otherLabel": "Provincia "
+        },
+
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Country",
+          "otherLabel": "País "
+        }
+      ]
+    },
+    {
+      "type": "VerticalLayout",
+      "elements": [
         {
           "type": "Control",
           "label": "Medios de Contacto",

@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 
 module.exports = (config) => {
+  config.cache = process.env.NO_CACHE !== '1';
 	config.module.rules[1].oneOf.splice(0, 0, {
 		test: /\.svg$/,
 		use: ["@svgr/webpack"],

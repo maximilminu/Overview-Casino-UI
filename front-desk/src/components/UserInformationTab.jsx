@@ -4,16 +4,16 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  useMediaQuery,
-  useTheme,
-  IconButton,
   Paper,
   ListItemAvatar,
   ListSubheader,
   Button,
+  Grid,
+  Fab,
+  useTheme,
 } from "@mui/material";
 import Avatar from "./Avatar";
-import React from "react";
+import React, { useLayoutEffect, useState } from "react";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import EditIcon from "@mui/icons-material/Edit";
@@ -25,14 +25,39 @@ import ContactMailIcon from "@mui/icons-material/ContactMail";
 import InteractionChannelIcon from "./JsonForms/InteractionChannelIcon";
 import usePaginationContact from "../hook/usePaginationContact";
 
+const style = {
+  list: {
+    backgroundColor: "#e7ebf0",
+    width: "80%",
+    height: "80%",
+  },
+  avatar: {
+    backgroundColor: "grey",
+    width: { xl: 76, md: 65, xs: 70 },
+    height: { xl: 76, md: 65, xs: 70 },
+  },
+};
+
 const UserInformationTab = ({ user, img }) => {
   const theme = useTheme();
-  const down600px = useMediaQuery(theme.breakpoints.down("sm"));
-  const down900px = useMediaQuery(theme.breakpoints.down("md"));
+  const [nameLength, setNameLength] = useState(false);
+  const [maxNameLength, setMaxNameLength] = useState(false);
   const { currentPage, nextPage, prevPage } = usePaginationContact(
     2,
     user?.ContactMethods
   );
+
+  useLayoutEffect(() => {
+    if (
+      user.Name.length + user.Lastname.length >= 20 &&
+      user.Name.length + user.Lastname.length <= 24
+    ) {
+      setNameLength(true);
+    }
+    if (user.Name.length + user.Lastname.length >= 25) {
+      setMaxNameLength(true);
+    }
+  }, [user]);
 
   const filteredCM = () => {
     if (user.ContactMethods) {
@@ -42,282 +67,224 @@ const UserInformationTab = ({ user, img }) => {
     }
   };
 
-  const style = {
-    list: {
-      backgroundColor: "#e7ebf0",
-      minHeight: { xl: "500px" },
-      width: "90%",
-      padding: "2px",
-      alignItems: "center",
-      display: "flex",
-      flexDirection: "column",
-    },
-    avatar: {
-      backgroundColor: "grey",
-      width: 76,
-      height: 76,
-      fontSize: "30px",
-      marginLeft: { lg: "20px" },
-      marginBottom: { lg: "5px", xl: "-20px" },
-    },
+  const capitalizer = (word) => {
+    const result = word.split(" ").map((singleWord) => {
+      return (
+        singleWord.charAt(0).toUpperCase() + singleWord.slice(1).toLowerCase()
+      );
+    });
+    return result.join(" ");
   };
+
   return (
     user.Name && (
-      <Paper
-        sx={{
-          width: { sm: "100%", lg: "80%" },
-          height: { xl: 650, lg: "650px", md: 700 },
-        }}
-      >
-        <Box
+      <>
+        <Grid
+          container
+          component={Paper}
           sx={{
-            maxHeight: "80vh",
+            height: { xl: "85%", md: "95%", xs: "75%" },
             display: "flex",
+            justifyContent: "center",
             flexDirection: "column",
             alignItems: "center",
+            padding: "15px",
           }}
         >
-          <Box
+          <Grid
+            item
             sx={{
-              width: "100%",
+              width: "90%",
+              height: { xl: "15%", lg: "10%", md: "15%", xs: "20%" },
               display: "flex",
-              flexDirection: { xs: "column", md: "row" },
               alignItems: "center",
-              gap: "10px",
-              marginBottom: { xs: "5px", xl: "20px" },
-              marginTop: down600px ? "none" : "20px",
-              paddingTop: down600px && "25px",
             }}
           >
-            <Box
+            <Grid
+              container
               sx={{
-                width: { lg: "20%" },
-                marginLeft: { md: "15px" },
-                marginBottom: { md: "15px" },
-                marginRight: { lg: "30px" },
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: " flex-start",
               }}
             >
               <Avatar sx={style.avatar} subject={user} />
-            </Box>
-            <Box
-              sx={{
-                width: { lg: "50%" },
-                flexGrow: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: down900px ? "20px" : "20px",
-                  marginLeft: { lg: "10px" },
-                }}
-              >
-                {user.Name} {user.Lastname}
-              </Typography>
-            </Box>
-          </Box>
-          {down900px ? (
-            <>
               <Box
                 sx={{
+                  marginLeft: "20px",
                   display: "flex",
                   flexDirection: "row",
+                  justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <List
-                  dense={true}
-                  sx={style.list}
-                  subheader={
-                    <ListSubheader
-                      sx={{
-                        lineHeight: "30px",
-                        backgroundColor: "#e7ebf0",
-                        marginRight: "auto",
-                      }}
-                    >
-                      Datos personales:
-                    </ListSubheader>
-                  }
+                <Typography
+                  sx={{
+                    fontSize: {
+                      xl: nameLength ? "20px" : maxNameLength ? "16px" : "30px",
+                      lg: nameLength ? "20px" : maxNameLength ? "18px" : "25px",
+                      md: nameLength ? "15px" : maxNameLength ? "17px" : "20px",
+                      xs: nameLength ? "20px" : maxNameLength ? "18px" : "25px",
+                    },
+                  }}
                 >
-                  <ListItem>
-                    <ListItemAvatar>
-                      <FingerprintOutlinedIcon />
-                    </ListItemAvatar>
-                    <ListItemText primary="Dni:" secondary={user.LegalID} />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <CakeIcon />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary="Nacimiento:"
-                      secondary={user.Birthdate}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <PlaceIcon />
-                    </ListItemAvatar>
-                    <ListItemText primary="Area:" secondary={user.Area} />
-                  </ListItem>
-                </List>
-                <List
-                  dense={true}
-                  sx={style.list}
-                  subheader={
-                    <ListSubheader
-                      sx={{
-                        lineHeight: "30px",
-                        backgroundColor: "#e7ebf0",
-                        marginRight: "auto",
-                      }}
-                    >
-                      Datos de Contacto:
-                    </ListSubheader>
-                  }
+                  {capitalizer(user.Name)}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: {
+                      xl: nameLength ? "20px" : maxNameLength ? "16px" : "30px",
+                      xs: nameLength ? "20px" : maxNameLength ? "18px" : "25px",
+                      lg: nameLength ? "20px" : maxNameLength ? "18px" : "25px",
+                      md: nameLength ? "15px" : maxNameLength ? "17px" : "20px",
+                    },
+                    marginLeft: { xs: "5px", md: "5px" },
+                  }}
                 >
-                  <ListItem>
-                    <ListItemAvatar>
-                      <ContactMailIcon />
-                    </ListItemAvatar>
-                    <ListItemText primary={"Email:"} secondary={user.Email} />
-                  </ListItem>
-                  {(filteredCM() || []).map((cm) => (
-                    <ListItem>
-                      <ListItemAvatar>
-                        <InteractionChannelIcon media={cm.Type} />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={
-                          cm.Type === "landphone" || cm.Type === "cellphone"
-                            ? "Telefono"
-                            : cm.Type
-                        }
-                        secondary={
-                          cm.Type === "landphone" || cm.Type === "cellphone"
-                            ? `${cm.Value.Country}-${cm.Value.Region}-${cm.Value.Number}`
-                            : cm.Value
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
+                  {capitalizer(user.Lastname)}
+                </Typography>
               </Box>
-            </>
-          ) : (
-            <>
-              <List
-                dense={true}
-                sx={style.list}
-                subheader={
-                  <ListSubheader
-                    sx={{
-                      lineHeight: "30px",
-                      backgroundColor: "#e7ebf0",
-                      marginRight: "auto",
-                    }}
-                  >
-                    Datos personales:
-                  </ListSubheader>
-                }
-              >
-                <ListItem>
-                  <ListItemAvatar>
-                    <FingerprintOutlinedIcon />
-                  </ListItemAvatar>
-                  <ListItemText primary="Dni:" secondary={user.LegalID} />
-                </ListItem>
-                <ListItem>
-                  <ListItemAvatar>
-                    <CakeIcon />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="Nacimiento:"
-                    secondary={user.Birthdate}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemAvatar>
-                    <PlaceIcon />
-                  </ListItemAvatar>
-                  <ListItemText primary="Area:" secondary={user.Area} />
-                </ListItem>
+            </Grid>
+          </Grid>
+
+          <Grid
+            item
+            sx={{
+              width: "90%",
+              height: { xs: "60%", md: "65%" },
+              overflow: "auto",
+              marginTop: "5px",
+            }}
+          >
+            <List
+              dense={true}
+              subheader={
                 <ListSubheader
                   sx={{
                     lineHeight: "30px",
-                    backgroundColor: "#e7ebf0",
                     marginRight: "auto",
                   }}
                 >
-                  Datos de Contacto:
+                  Datos personales:
                 </ListSubheader>
-
-                <ListItem>
+              }
+            >
+              <ListItem sx={{ paddingY: "1px" }}>
+                <ListItemAvatar>
+                  <FingerprintOutlinedIcon />
+                </ListItemAvatar>
+                <ListItemText primary="Dni:" secondary={user.LegalID} />
+              </ListItem>
+              <ListItem>
+                <ListItemAvatar>
+                  <CakeIcon />
+                </ListItemAvatar>
+                <ListItemText
+                  primary="Nacimiento:"
+                  secondary={user.Birthdate}
+                />
+              </ListItem>
+              {user.Address.Area ? (
+                <ListItem sx={{ paddingY: "1px" }}>
                   <ListItemAvatar>
-                    <ContactMailIcon />
+                    <PlaceIcon />
                   </ListItemAvatar>
-                  <ListItemText primary={"Email:"} secondary={user.Email} />
+                  <ListItemText
+                    primary="Area:"
+                    secondary={capitalizer(user.Address.Area)}
+                  />
                 </ListItem>
-                {(filteredCM() || []).map((cm) => (
-                  <ListItem>
-                    <ListItemAvatar>
-                      <InteractionChannelIcon media={cm.Type} />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        cm.Type === "landphone" || cm.Type === "cellphone"
-                          ? "Telefono"
-                          : cm.Type
-                      }
-                      secondary={
-                        cm.Type === "landphone" || cm.Type === "cellphone"
-                          ? `${cm.Value.Country}-${cm.Value.Region}-${cm.Value.Number}`
-                          : cm.Value
-                      }
-                    />
-                  </ListItem>
-                ))}
+              ) : null}
+              <ListSubheader
+                sx={{
+                  lineHeight: "30px",
+                  marginRight: "auto",
+                }}
+              >
+                Datos de Contacto:
+              </ListSubheader>
+              <ListItem sx={{ paddingY: "1px" }}>
+                <ListItemAvatar>
+                  <ContactMailIcon />
+                </ListItemAvatar>
+                <ListItemText primary={"Email:"} secondary={user.Email} />
+              </ListItem>
+              {(filteredCM() || []).map((cm, cmIdx) => (
+                <ListItem sx={{ paddingY: "1px" }} key={cmIdx}>
+                  <ListItemAvatar>
+                    <InteractionChannelIcon media={cm} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      cm.Type === "landphone" || cm.Type === "cellphone"
+                        ? "Teléfono"
+                        : cm.Type
+                    }
+                    secondary={
+                      cm.Type === "landphone" || cm.Type === "cellphone"
+                        ? `${cm.Value.Country}-${cm.Value.Region}-${cm.Value.Number}`
+                        : cm.Value
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <Button onClick={prevPage}>
-                    <ArrowBackIosIcon fontSize="small" />
-                  </Button>
-                  <Button onClick={nextPage}>
-                    <ArrowForwardIosIcon fontSize="small" />
-                  </Button>
-                </Box>
-              </List>
-            </>
-          )}
-          <Box
+          <Grid
+            item
             sx={{
+              width: "100%",
+              height: { xs: "15%" },
               display: "flex",
-              justifyContent: "flex-end",
+              flexDirection: "column",
             }}
           >
-            <Link
-              style={{ textDecoration: "none", color: "white" }}
-              to={`edition`}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <IconButton
-                sx={{ color: "primary.main", borderRadius: "50px" }}
-                aria-label="edit"
+              <Button onClick={prevPage}>
+                <ArrowBackIosIcon fontSize="small" />
+              </Button>
+              <Button onClick={nextPage}>
+                <ArrowForwardIosIcon fontSize="small" />
+              </Button>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Link
+                style={{ textDecoration: "none", color: "white" }}
+                to={`edition`}
               >
-                <EditIcon />
-              </IconButton>
-            </Link>
-          </Box>
-        </Box>
-      </Paper>
+                <Fab
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "third.main",
+                    width: { lg: "50px", md: "40px", xs: "35px" },
+                    height: { lg: "50px", md: "40px", xs: "35px" },
+                    marginRight: "3px",
+                    "&:hover": {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
+                  }}
+                >
+                  <EditIcon />
+                </Fab>
+              </Link>
+            </Box>
+          </Grid>
+        </Grid>
+      </>
     )
   );
 };

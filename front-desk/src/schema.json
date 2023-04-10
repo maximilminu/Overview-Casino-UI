@@ -3,21 +3,25 @@
   "properties": {
     "Name": {
       "title": "Nombre",
-      "type": "string",
-      "minLength": 3
+      "type": "string"
     },
     "Lastname": {
       "title": "Apellido",
-      "type": "string",
-      "minLength": 3
+      "type": "string"
+    },
+    "IsBanned": {
+      "title": "Baneado",
+      "type": "boolean"
     },
     "Birthdate": {
       "title": "Fecha de nacimiento",
-      "type": "string"
+      "type": "string",
+      "label": "Birthdate"
     },
     "LegalID": {
       "title": "DNI",
-      "type": "string"
+      "type": "string",
+      "label": "LegalID"
     },
     "Avatar": {
       "title": "Avatar",
@@ -25,10 +29,36 @@
       "contentEncoding": "base64",
       "contentMediaType": "image/jpeg"
     },
-    "Area": {
-      "title": "Area",
+    "Line1": {
+      "title": "Dirección",
       "type": "string"
     },
+    "Line2": {
+      "title": "Dirección 2",
+      "type": "string"
+    },
+
+    "Area": {
+      "title": "Zona",
+      "type": "string"
+    },
+    "Location": {
+      "title": "Ciudad",
+      "type": "string"
+    },
+    "Region": {
+      "title": "Provincia",
+      "type": "string"
+    },
+    "Zip": {
+      "title": "Código Postal",
+      "type": "string"
+    },
+    "Country": {
+      "title": "Pais",
+      "type": "string"
+    },
+
     "Email": {
       "title": "Email",
       "type": "string",
@@ -44,7 +74,14 @@
           "Type": {
             "title": "Tipo",
             "type": "string",
-            "enum": ["phone", "whatsapp", "telegram", "instagram", "messenger", "landphone"]
+            "enum": [
+              "phone",
+              "whatsapp",
+              "telegram",
+              "instagram",
+              "messenger",
+              "landphone"
+            ]
           },
           "Value": {
             "oneOf": [
