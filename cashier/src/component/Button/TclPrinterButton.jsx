@@ -3,7 +3,7 @@ import { BookOnline } from "@mui/icons-material";
 import {
   TclPrinterContext,
   PRINTER_STATUS_OFFLINE,
-} from "../../context/TclPrinterContext";
+} from "@oc/tcl-printer-context";
 import { IconButton, Typography, useTheme, useMediaQuery } from "@mui/material";
 
 const PrinterButton = () => {

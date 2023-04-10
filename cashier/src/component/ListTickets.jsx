@@ -7,13 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { IconButton, Paper } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-
-import {
-  FormatLocalCurrency,
-  FormatLocalDateTime,
-  FormatLocalDate,
-  FormatLocalTime,
-} from "../utils/Intl";
+import { FormatLocalCurrency, FormatLocalDateTime } from "../utils/Intl";
 const style = {
   tableCell: {
     fontWeight: "700",

@@ -1,241 +1,84 @@
-import { ExpandMore } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Button,
+  Dialog,
+  DialogTitle,
   FormControl,
   Grid,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
-import { Box, styled } from "@mui/system";
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { ApiContext } from "../context/ApiContext";
-import {
-  FormatLocalCurrency,
-  FormatLocalDateTime,
-  FormatLocalDate,
-  FormatLocalTime,
-} from "../utils/Intl";
-import { EscPosPrinterContext } from "../context/EscPosPrinterContext";
-import { NotifyUserContext } from "../context/NotifyUserContext";
+import { Box } from "@mui/system";
+import { useContext, useLayoutEffect, useState } from "react";
+import jwt_decode from "jwt-decode";
+import { ApiContext } from "@oc/api-context";
+import { FormatLocalCurrency } from "../utils/Intl";
+import { EscPosPrinterContext } from "@oc/escpos-printer-context";
+import { print } from "../utils/PrintUtils";
+import { NotifyUserContext } from "@oc/notify-user-context";
+import { Link, useOutletContext } from "react-router-dom";
+import InformationAccordion from "../component/InformationAccordion";
+import DialogLogInSupervisor from "../component/DialogLogInSupervisor";
+import ConfirmDialog from "../component/ConfirmDialog";
+import Tokens from "../component/Tokens";
 
-const printTitle = (printer, title) => {
-  printer
-    .align("ct")
-    .style("normal")
-    .size(0, 0)
-    .text("─".repeat(45))
-    .size(1, 0)
-    .style("b");
-  (Array.isArray(title) ? title : [title]).forEach((t) => printer.text(t));
-  printer.style("normal").size(0, 0).text("─".repeat(45));
-};
-
-const printSignature = (printer, name, title) => {
-  printer
-    .align("ct")
-    .style("normal")
-    .size(0, 0)
-    .feed(7)
-    .text("-".repeat(30))
-    .size(1, 0)
-    .style("b")
-    .text(name)
-    .style("normal")
-    .size(0, 0)
-    .text(title)
-    .size(0, 0);
-};
-
-const printFailure = (printer, data) => {
-  if (data.OverTolerance) {
-    printer
-      .feed(2)
-      .style("b")
-      .size(1, 1)
-      .align("ct")
-      .text("FALLO - SOBRANTE")
-      .style("normal")
-      .size(0, 0);
-    if (data.Tolerance !== 0) {
-      printer.text("Tolerancia: " + FormatLocalCurrency(data.Tolerance));
-    }
-  }
-  if (data.UnderTolerance) {
-    printer
-      .feed(2)
-      .style("b")
-      .size(1, 1)
-      .align("ct")
-      .text("FALLO - FALTANTE")
-      .style("normal")
-      .size(0, 0);
-    if (data.Tolerance !== 0) {
-      printer.text("Tolerancia: " + FormatLocalCurrency(data.Tolerance));
-    }
-  }
-};
-
-const printDescValue = (
-  printer,
-  description,
-  value,
-  style = "normal",
-  width = 48,
-  sign = false
-) => {
-  let val;
-  if (!sign) {
-    val =
-      FormatLocalCurrency(Math.abs(value)) + (value < 0 ? " ".repeat(15) : "");
-  } else {
-    val = FormatLocalCurrency(value);
-  }
-  const w = width - (description.length + val.length);
-  printer
-    .style(style)
-    .align("lt")
-    .text(
-      (w < 1 ? description.substring(0, w - 1) : description) +
-        (w > 0 ? " ".repeat(w) : "") +
-        val
-    );
-};
-
-const print = (data, qr, url) => (printer) =>
-  new Promise((resolve) => {
-    printFailure(printer, data);
-
-    printTitle(printer, [
-      "Arqueo de caja",
-      "",
-      data.RegisteredBy.FullName,
-      data.Qty + "° del " + FormatLocalDate(new Date(data.WorkingDate)),
-      FormatLocalDateTime(new Date(data.CreatedAt)),
-    ]);
-
-    printTitle(printer, "Estado actual");
-
-    printer
-      .align("lt")
-      .style("b")
-      .text(
-        `${" Denomin. x Cantidad".padEnd(20, " ")}${" ".repeat(
-          6
-        )}${"SubTotal".padStart(20, " ")}`
-      )
-      .style("normal");
-
-    Object.keys(data.Bills)
-      .sort((a, b) => b - a)
-      .forEach((denom) =>
-        printer.text(
-          `${`$ ${String(denom).padStart(7, " ")} x ${String(
-            data.Bills[denom]
-          ).padStart(8, " ")}`}${" ".repeat(6)}${FormatLocalCurrency(
-            denom * data.Bills[denom]
-          ).padStart(20, " ")}`
-        )
-      );
-
-    printTitle(printer, "Movimientos");
-    printer.text("Descripción               Haber         Debe");
-    data.RegisterHistory.forEach((ch) => {
-      printDescValue(
-        printer,
-        `Arqueo parcial ${FormatLocalTime(ch.CreatedAt)}`,
-        ch.Balance
-      );
-    });
-    data.TreasureToCashierHistory.forEach((ch) =>
-      printDescValue(
-        printer,
-        `${ch.Description} por ${ch.Treasurer.FullName}`,
-        ch.Amount
-      )
-    );
-
-    printDescValue(
-      printer,
-      "TOTAL PAGADOS",
-      -data.PaidTickets.reduce((tot, cur) => (tot += cur.Amount), 0)
-    );
-    printDescValue(
-      printer,
-      "TOTAL EMITIDOS",
-      data.IssuedTickets.reduce((tot, cur) => (tot += cur.Amount), 0)
-    );
-
-    printTitle(printer, "Resumen");
-    printDescValue(printer, "Entradas", data.TotalIn);
-    printDescValue(printer, "Salidas", -data.TotalOut);
-    printDescValue(printer, "En caja", -data.TotalBills);
-    printer.align("lt").style("b").size(1, 0).text("-".repeat(24));
-    printDescValue(printer, "BALANCE", data.Balance, "b", 24, true);
-
-    printFailure(printer, data);
-
-    printer.size(0, 0).raster(qr).align("ct").text(url);
-
-    printSignature(printer, data.RegisteredBy.FullName, "Cajero");
-    if (data.Authorizing) {
-      printSignature(printer, data.Authorizing.FullName, data.Authorizing.Role);
-    }
-
-    printFailure(printer, data);
-
-    resolve();
-  });
-
-const Register = ({ userMenuRef }) => {
+const Register = (props) => {
   const theme = useTheme();
   const { Printer } = useContext(EscPosPrinterContext);
   const NotifyUser = useContext(NotifyUserContext);
-  const { Get, Post } = useContext(ApiContext);
+  const { Get, Post, logInSupervisor } = useContext(ApiContext);
   const [denominations, setDenominations] = useState([]);
-  const [tolerance, setTolerance] = useState(0);
+  const [tolerance, setTolerance] = useState(500);
   const [bills, setBills] = useState({});
   const [disabledInputs, setDisabledInputs] = useState(false);
-  const [register, setRegister] = useState({
-    TreasureToCashierHistory: [],
-    PaidTickets: [],
-    IssuedTickets: [],
-    RegisterHistory: [],
-  });
-
+  const [showAccordionInformation, setShowAccordionInformation] =
+    useState(false);
+  const [register, setRegister] = useState({});
+  const [supervisionModal, setSupervisionModal] = useState(false);
   const [balance, setBalance] = useState(0);
-  const [totalTreasureToCashierHistory, setTotalTreasureToCashierHistory] =
-    useState(0);
-  const [totalPaidTickets, setTotalPaidTickets] = useState(0);
-  const [totalIssuedTickets, setTotalIssuedTickets] = useState(0);
+  const [showConfirmTicketDialog, setShowConfirmTicketDialog] = useState(false);
+  const [balanceMadeBySupervisor, setBalanceMadeBySupervisor] = useState(0);
   const [totalBills, setTotalBills] = useState(0);
   const [showConfirmButton, setShowConfirmButton] = useState(true);
-  const [showAccordion, setShowAccordion] = useState(true);
-
-  const DeletedEntry = styled(TableRow)(({ theme }) => ({
-    "&": {
-      backgroundColor: theme.palette.error.light,
-    },
-  }));
+  const [showSupervisionAccordion, setShowSupervisionAccordion] =
+    useState(false);
+  // eslint-disable-next-line
+  const [disable, setDisable] = useOutletContext();
+  const [showAlertFailedBalance, setShowAlertFailedBalance] = useState(false);
+  const [totalBillsBySupervisor, setTotalBillsBySupervisor] = useState(0);
+  const [billsBySupervisor, setBillsBySupervisor] = useState(0);
+  const [closeWithoutFail, setCloseWithoutFail] = useState(false);
+  const [closeWithFail, setCloseWithFail] = useState(false);
+  const [handleChangePassword, setHandleChangePassword] = useState("");
+  const [handleChangeEmail, setHandleChangeEmail] = useState("");
+  const [supervisorToken, setSupervisorToken] = useState();
+  const [showFinishOperationButtons, setShowFinishOperationButtons] =
+    useState(false);
+  const [showActualMoney, setShowActualMoney] = useState(true);
+  const [supervisorName, setSupervisorName] = useState();
+  const [usdDenomination, setUsdDenomination] = useState([]);
+  const [usdBills, setUsdBills] = useState(0);
+  const [totalUsdBills, setTotalUsdBills] = useState(0);
 
   useLayoutEffect(() => {
+    //Get("/api/config")
     const denoms = [1000, 500, 200, 100, 50, 20, 10];
+    const usdDenoms = [100, 50, 10, 5, 1];
+    setUsdDenomination(usdDenoms);
     setDenominations(denoms);
-    setTolerance(0);
+    setTolerance(500);
     const bls = {};
+    const usdBls = {};
+    usdDenoms.forEach((d) => {
+      usdBls[d] = 0;
+    });
     denoms.forEach((d) => (bls[d] = 0));
     setBills(bls);
+    setUsdBills(usdBls);
+    setBillsBySupervisor(bls);
   }, []);
+  console.log(usdBills);
 
   const handleBillChange = (denom, amount) => {
     const b = Object.assign({}, bills, {
@@ -244,72 +87,94 @@ const Register = ({ userMenuRef }) => {
     const t = denominations.reduce((sum, deno) => (sum += deno * b[deno]), 0);
     setTotalBills(t);
     setBills(b);
-    setBalance(
-      totalTreasureToCashierHistory - totalPaidTickets + totalIssuedTickets - t
-    );
+  };
+
+  const handleBillBySupervisorChange = (denom, amount) => {
+    const b = Object.assign({}, billsBySupervisor, {
+      [denom]: Number.parseInt(amount) || 0,
+    });
+    const t = denominations.reduce((sum, deno) => (sum += deno * b[deno]), 0);
+    setTotalBillsBySupervisor(t);
+    setBillsBySupervisor(b);
+  };
+
+  const handleUsdBills = (denom, amount) => {
+    console.log(denom, "denom");
+    console.log(amount, "amount");
+    const b = Object.assign({}, usdBills, {
+      [denom]: Number.parseInt(amount) || 0,
+    });
+    const t = usdDenomination.reduce((sum, deno) => (sum += deno * b[deno]), 0);
+    setTotalUsdBills(t);
+    setUsdBills(b);
+  };
+  console.log(totalUsdBills);
+  const handleSubmitSupervisorLogin = () => {
+    logInSupervisor({
+      Email: handleChangeEmail,
+      Password: handleChangePassword,
+    })
+      .then(({ data }) => {
+        setSupervisorName(jwt_decode(data.access_token).Profile.FullName);
+        setSupervisorToken(data.access_token);
+        setSupervisionModal(false);
+        setDisabledInputs(true);
+        setShowSupervisionAccordion(true);
+        setShowAlertFailedBalance(false);
+        setShowConfirmButton(true);
+      })
+      .catch((error) => {
+        if (error.message === "401") {
+          NotifyUser.Warning(
+            "Credenciales inválidas, verifique los datos ingresados"
+          );
+        }
+      });
+  };
+  // eslint-disable-next-line
+  const sortFn = (a, b) => {
+    return a.CreatedAt - b.CreateAt;
   };
 
   const handleSave = () => {
     register.CreatedAt = Date.now();
     register.WorkingDate = Date.now();
-    register.Bills = bills;
-    register.Authorizing = { FullName: "Juan Pomo", Role: "Jefe de cajas" };
-    register.RegisterHistory = [
-      {
-        ID: "6a345f90-3cbd-4446-8779-64c2fc52480b",
-        CreatedAt: Date.now(),
-        Balance: 0.0,
-      },
-      {
-        ID: "6a345f90-3cbd-4446-8779-64c2fc52480c",
-        CreatedAt: Date.now(),
-        Balance: -158.65,
-      },
-      {
-        ID: "6a345f90-3cbd-4446-8779-64c2fc52480a",
-        CreatedAt: Date.now(),
-        Balance: 500.25,
-      },
-    ];
+    register.Bills = balanceMadeBySupervisor ? billsBySupervisor : bills;
+    if (balanceMadeBySupervisor) {
+      register.Authorizing = {
+        FullName: supervisorName,
+        Role: "Jefe de cajas",
+      };
+    }
     register.Qty = 3;
     register.Round = 2;
-
     register.TotalIn = parseFloat(
-      (
-        register.TreasureToCashierHistory.reduce(
-          (sum, ch) => sum + ch.Amount,
-          0
-        ) + register.IssuedTickets.reduce((tot, cur) => (tot += cur.Amount), 0)
-      ).toFixed(register.Round)
-    );
-
-    register.TotalOut = parseFloat(
-      register.PaidTickets.reduce((tot, cur) => (tot += cur.Amount), 0).toFixed(
+      (register.TotalTreasureToCashier + register.TotalIssuedTickets).toFixed(
         register.Round
       )
     );
-    register.TotalBills = parseFloat(
-      Object.keys(register.Bills)
-        .reduce((sum, denom) => sum + register.Bills[denom] * denom, 0)
-        .toFixed(register.Round)
+    register.TotalOut = parseFloat(
+      register.TotalPaidTickets.toFixed(register.Round)
     );
-
-    register.Balance = balance;
-    // register.Balance = parseFloat(
-    //   Number(
-    //     register.RegisterHistory.reduce((sum, r) => (sum += r.Balance), 0)
-    //   ) +
-    //     register.TotalIn -
-    //     register.TotalOut -
-    //     register.TotalBills
-    //   //   register.TotalCurrent
-    // ).toFixed(register.Round);
+    register.TotalBills = balanceMadeBySupervisor
+      ? register.FailedBalance.TotalAmount
+      : register.TotalAmount;
 
     register.Tolerance = Number(tolerance);
-    register.OverTolerance = register.Balance > register.Tolerance;
-    register.UnderTolerance = register.Balance < -register.Tolerance;
+    register.OverTolerance = Math.abs(register.Balance) > register.Tolerance;
+    register.UnderTolerance = Math.abs(register.Balance) < -register.Tolerance;
+    if (register?.FailedBalance?.BalanceBySupervisor) {
+      register.OverToleranceBySupervisor =
+        Math.abs(register.FailedBalance.BalanceBySupervisor) >
+        register.Tolerance;
+      register.UnderToleranceBySupervisor =
+        Math.abs(register.FailedBalance.BalanceBySupervisor) <
+        -register.Tolerance;
+    }
+
     const url =
       "https://audit.overview.casino/cashier-register/6a345f90-3cbd-4446-8779-64c2fc52480b";
+
     Printer.makeQr(url).then((qr) => {
       Printer.print(print(register, qr, url), (err) =>
         NotifyUser.Error("Problemas para imprimir: " + err)
@@ -317,38 +182,41 @@ const Register = ({ userMenuRef }) => {
     });
   };
 
-  const handleConfirmBalance = () => {
+  const handleConfirmBalance = async () => {
     Post(`/register/v1/current`, {
       Bills: bills,
-      TotalAmount: totalBills,
     })
-      .then((register) => {
-        const tt = register.TreasureToCashierHistory.reduce(
-          (sum, ch) => (sum += ch.Amount),
-          0
-        );
-        const tp = register.PaidTickets.reduce(
-          (sum, ch) => (sum += ch.Amount),
-          0
-        );
-        const tm = register.IssuedTickets.reduce(
-          (sum, ch) => (sum += ch.Amount),
-          0
-        );
-        setShowAccordion(false);
-        setShowConfirmButton(false);
-        setTotalTreasureToCashierHistory(tt);
-        setTotalPaidTickets(tp);
-        setTotalIssuedTickets(tm);
-        setDisabledInputs(true);
-        setBalance(tt - tp + tm - totalBills);
-        return register;
-      })
-      .then(setRegister)
-      .then(() => {
-        Get("/register/v1/register_history").then((res) => console.log(res));
-      })
+      .then((currentResponse) => {
+        Get("/register/v1/register-history")
+          .then((historyResponse) => {
+            // const result = historyResponse.data
+            //   .concat(currentResponse.data.TreasureToCashierHistory)
+            //   .sort(sortFn);
 
+            // setRegister({
+            //   ...currentResponse.data,
+            //   RegisterHistory: result,
+            // });
+            setRegister({
+              ...currentResponse.data,
+              RegisterHistory: historyResponse.data,
+            });
+            setShowAccordionInformation(true);
+            setBalance(currentResponse.Balance);
+            setShowConfirmButton(false);
+            setDisabledInputs(true);
+            if (Math.abs(currentResponse.Balance) >= tolerance) {
+              setShowAlertFailedBalance(true);
+            } else {
+              setCloseWithoutFail(true);
+            }
+          })
+          .catch((err) => {
+            NotifyUser.Warning(
+              "Error para obtener el registro de balances del día."
+            );
+          });
+      })
       .catch((err) => {
         if (err.response.status === 500) {
           NotifyUser.Warning(
@@ -358,318 +226,248 @@ const Register = ({ userMenuRef }) => {
       });
   };
 
+  const handleConfirmBalanceBySupervisor = async () => {
+    Post("/register/v1/balance-authorization", {
+      BillsBySupervisor: billsBySupervisor,
+      SupervisorToken: supervisorToken,
+      BalanceID: register.ID,
+    }).then(({ data }) => {
+      setRegister({ ...register, FailedBalance: data.FailedBalance });
+      register.BalanceBySupervisor = data.FailedBalance.BalanceBySupervisor;
+      setBalanceMadeBySupervisor(data.FailedBalance.BalanceBySupervisor);
+      Math.abs(data.FailedBalance.BalanceBySupervisor) <= tolerance
+        ? setCloseWithoutFail(true)
+        : setCloseWithFail(true);
+    });
+  };
+
   return (
-    <Grid
-      container
-      sx={{
-        flexWrap: "nowrap",
-        justifyContent: "space-around",
-        paddingBottom: 2,
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-      }}
-    >
-      <Grid lg={4} sx={{ marginTop: "30px", marginLeft: "30px" }} item>
-        <Paper sx={{ padding: "20px" }}>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            {denominations.map((denom, idx) => (
-              <FormControl key={denom} fullWidth sx={{ marginY: 1 }}>
-                <TextField
-                  disabled={disabledInputs}
-                  id={`input-${denom}`}
-                  autoFocus={idx === 0}
-                  label={`Billetes de $${denom}`}
-                  value={bills[denom]}
-                  size="small"
-                  onChange={(event) => {
-                    handleBillChange(denom, event.target.value);
-                  }}
-                  onFocus={(event) => {
-                    event.target.select();
-                  }}
-                />
-              </FormControl>
-            ))}
-          </Box>
-        </Paper>
-      </Grid>
+    <>
       <Grid
-        item
-        sx={{
-          flexGrow: 1,
-          padding: "30px",
-          flexDirection: "column",
-          flexWrap: "nowrap",
-        }}
         container
+        sx={{
+          flexWrap: "nowrap",
+          justifyContent: "space-around",
+          paddingBottom: 2,
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        }}
       >
         <Grid
+          lg={4}
+          md={5}
+          sx={{
+            marginTop: "30px",
+            marginLeft: "30px",
+            height: "90%",
+          }}
           item
-          sx={{ flexGrow: 1, flexDirection: "column", overflow: "auto" }}
         >
-          <Accordion
-            disabled={showAccordion}
-            sx={{
-              flexDirection: "row",
-              flexWrap: "nowrap",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1bh-content"
-            >
-              <Typography sx={{ width: "33%", flexGrow: 1 }}>
-                Aportes desde caja central
-              </Typography>
-              <Box sx={{ flexGrow: "1" }}></Box>
-              <Typography sx={{ color: "text.secondary" }}>
-                {FormatLocalCurrency(totalTreasureToCashierHistory)}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Hora</TableCell>
-                      <TableCell>Otorga</TableCell>
-                      <TableCell>Monto</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {register.TreasureToCashierHistory.map((ch) =>
-                      ch.Deleted ? (
-                        <DeletedEntry key={ch.CreatedAt}>
-                          <TableCell>
-                            {new Date(ch.CreatedAt).toLocaleTimeString()}
-                          </TableCell>
-                          <TableCell>
-                            {ch.Description} por {ch.Treasurer.FullName}
-                          </TableCell>
-                          <TableCell>
-                            {FormatLocalCurrency(ch.Amount)}
-                          </TableCell>
-                        </DeletedEntry>
-                      ) : (
-                        <TableRow key={ch.CreatedAt}>
-                          <TableCell>
-                            {new Date(ch.CreatedAt).toLocaleTimeString()}
-                          </TableCell>
-                          <TableCell>
-                            {ch.Description} por {ch.Treasurer.FullName}
-                          </TableCell>
-                          <TableCell>
-                            {FormatLocalCurrency(ch.Amount)}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion
-            disabled={showAccordion}
-            sx={{
-              flexDirection: "row",
-              flexWrap: "nowrap",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1bh-content"
-            >
-              <Typography sx={{ width: "33%", flexGrow: 1 }}>
-                Pagos realizados
-              </Typography>
-              <Box sx={{ flexGrow: "1" }}></Box>
-              <Typography sx={{ color: "text.secondary" }}>
-                {FormatLocalCurrency(totalPaidTickets)}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Hora</TableCell>
-                      <TableCell>Número/Máquina</TableCell>
-                      <TableCell>Monto</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {register.PaidTickets.map((ch) => (
-                      <TableRow key={ch.ID}>
-                        <TableCell>
-                          {new Date(ch.PrintedAt).toLocaleTimeString()}
-                        </TableCell>
-                        <TableCell>
-                          {ch.Barcode} / {ch.PrintedIn}
-                        </TableCell>
-                        <TableCell>{FormatLocalCurrency(ch.Amount)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion
-            disabled={showAccordion}
-            sx={{
-              flexDirection: "row",
-              flexWrap: "nowrap",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1bh-content"
-            >
-              <Typography sx={{ width: "33%", flexGrow: 1 }}>
-                Tickets de vuelto
-              </Typography>
-              <Box sx={{ flexGrow: "1" }}></Box>
-              <Typography sx={{ color: "text.secondary" }}>
-                {FormatLocalCurrency(totalIssuedTickets)}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Hora</TableCell>
-                      <TableCell>Número</TableCell>
-                      <TableCell>Monto</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {register.IssuedTickets.map((ch) => (
-                      <TableRow key={ch.ID}>
-                        <TableCell>
-                          {new Date(ch.PrintedAt).toLocaleTimeString()}
-                        </TableCell>
-                        <TableCell>{ch.Barcode}</TableCell>
-                        <TableCell>{FormatLocalCurrency(ch.Amount)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion
-            sx={{
-              flexDirection: "row",
-              flexWrap: "nowrap",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1bh-content"
-            >
-              <Typography sx={{ width: "33%", flexGrow: 1 }}>
-                Dinero actual declarado
-              </Typography>
-              <Box sx={{ flexGrow: "1" }}></Box>
-              <Typography sx={{ color: "text.secondary" }}>
-                {FormatLocalCurrency(totalBills)}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Denominación</TableCell>
-                      <TableCell>Monto</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {denominations.map((denom) => (
-                      <TableRow key={denom}>
-                        <TableCell>{denom}</TableCell>
-                        <TableCell>$ {bills[denom] * denom}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </AccordionDetails>
-          </Accordion>
+          <Tokens
+            denominations={denominations}
+            showSupervisionAccordion={showSupervisionAccordion}
+            disabledInputs={disabledInputs}
+            handleBillBySupervisorChange={handleBillBySupervisorChange}
+            billsBySupervisor={billsBySupervisor}
+            bills={bills}
+            handleBillChange={handleBillChange}
+            usdBills={usdBills}
+            handleUsdBills={handleUsdBills}
+            usdDenomination={usdDenomination}
+          />
         </Grid>
-        <Grid item sx={{ flexDirection: "column" }} container>
-          <Grid item>
-            <Typography>Balance</Typography>
-          </Grid>
-          <Grid item>
-            <Typography
-              variant="h3"
-              sx={{
-                color:
-                  Math.abs(balance) < tolerance
-                    ? theme.palette.success.main
-                    : theme.palette.error.main,
-              }}
-            >
-              {register.TreasureToCashierHistory
-                ? FormatLocalCurrency(balance)
-                : "ERROR"}
-            </Typography>
-          </Grid>
-          <Grid item>
-            {showConfirmButton ? (
-              <Button
-                variant="contained"
-                sx={{
-                  padding: "15px",
-                  fontSize: "15px",
-                  backgroundColor:
-                    Math.abs(balance) < tolerance
-                      ? theme.palette.success.main
-                      : theme.palette.error.main,
+
+        <Grid
+          item
+          sx={{
+            flexGrow: 1,
+            padding: "30px",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+          }}
+          container
+        >
+          <InformationAccordion
+            totalBillsBySupervisor={totalBillsBySupervisor}
+            totalBills={totalBills}
+            bills={bills}
+            billsBySupervisor={billsBySupervisor}
+            showSupervisionAccordion={showSupervisionAccordion}
+            denominations={denominations}
+            usdBills={usdBills}
+            usdDenomination={usdDenomination}
+            register={register}
+            showActualMoney={showActualMoney}
+            showAccordionInformation={showAccordionInformation}
+            totalUsdBills={totalUsdBills}
+          />
+
+          <Grid item sx={{ flexDirection: "column" }} container>
+            <Grid item>
+              <Typography>Balance</Typography>
+            </Grid>
+            <Grid item>
+              {showSupervisionAccordion ? (
+                <Typography
+                  variant="h3"
+                  sx={{
+                    color:
+                      Math.abs(
+                        balanceMadeBySupervisor
+                          ? balanceMadeBySupervisor
+                          : totalBillsBySupervisor
+                      ) <= tolerance
+                        ? theme.palette.success.main
+                        : theme.palette.error.main,
+                  }}
+                >
+                  {balanceMadeBySupervisor
+                    ? FormatLocalCurrency(balanceMadeBySupervisor)
+                    : FormatLocalCurrency(totalBillsBySupervisor)}
+                </Typography>
+              ) : (
+                <Typography
+                  variant="h3"
+                  sx={{
+                    color:
+                      Math.abs(balance) <= tolerance
+                        ? theme.palette.success.main
+                        : theme.palette.error.main,
+                  }}
+                >
+                  {register.TreasureToCashierHistory
+                    ? FormatLocalCurrency(balance)
+                    : FormatLocalCurrency(totalBills + totalUsdBills)}
+                </Typography>
+              )}
+            </Grid>
+            <Grid item>
+              {showConfirmButton && (
+                <Button
+                  variant="contained"
+                  sx={{
+                    padding: "15px",
+                    fontSize: "15px",
+                  }}
+                  onClick={() => {
+                    if (showSupervisionAccordion) {
+                      handleConfirmBalanceBySupervisor();
+                      setShowActualMoney(true);
+                      setShowConfirmButton(false);
+                      setDisabledInputs(false);
+                      setShowAccordionInformation(true);
+                    } else {
+                      handleConfirmBalance();
+                      setDisable(true);
+                    }
+                  }}
+                >
+                  Confirmar arqueo
+                </Button>
+              )}
+
+              {showAlertFailedBalance && (
+                <Button
+                  onClick={() => {
+                    setSupervisionModal(true);
+                    setShowAccordionInformation(false);
+                    setShowActualMoney(false);
+                  }}
+                  variant="contained"
+                >
+                  Llamar supervisor
+                </Button>
+              )}
+
+              {showFinishOperationButtons && (
+                <Box
+                  sx={{ display: "flex", flexDirection: "row", gap: "15px" }}
+                >
+                  <Link
+                    style={{ textDecoration: "none" }}
+                    onClick={setDisable(false)}
+                    to="/cashier/pay"
+                  >
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        color: "secondary.main",
+                        borderColor: "secondary.main",
+                        "&:hover": {
+                          borderColor: "secondary.main",
+                          color: "secondary.main",
+                        },
+                      }}
+                    >
+                      Seguir trabajando
+                    </Button>
+                  </Link>
+                  <Link
+                    style={{ textDecoration: "none" }}
+                    onClick={setDisable(false)}
+                    to="/cashier"
+                  >
+                    <Button variant="contained">Cerrar caja</Button>
+                  </Link>
+                </Box>
+              )}
+
+              <ConfirmDialog
+                open={showConfirmTicketDialog}
+                title={"¡Arqueo realizado con éxito!"}
+                textFirstButton={"Re imprimir ticket"}
+                textSecondButton={"Terminar"}
+                onConfirm={handleSave}
+                onFinishOperation={() => {
+                  setShowConfirmTicketDialog(false);
+                  setShowFinishOperationButtons(true);
                 }}
-                onClick={() => {
-                  handleConfirmBalance();
-                }}
-              >
-                Confirmar arqueo
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                sx={{
-                  padding: "15px",
-                  fontSize: "15px",
-                  backgroundColor:
-                    Math.abs(balance) < tolerance
-                      ? theme.palette.success.main
-                      : theme.palette.error.main,
-                }}
-                onClick={handleSave}
-              >
-                Imprimir resultado
-              </Button>
-            )}
+              />
+
+              {closeWithoutFail && (
+                <Button
+                  onClick={() => {
+                    handleSave();
+                    setShowConfirmTicketDialog(true);
+                    setCloseWithoutFail(false);
+                  }}
+                  sx={{
+                    backgroundColor: theme.palette.success.main,
+                    "&:hover": { backgroundColor: theme.palette.success.main },
+                  }}
+                  variant="contained"
+                >
+                  Cerrar caja sin fallo
+                </Button>
+              )}
+
+              {closeWithFail && (
+                <Button
+                  onClick={() => {
+                    handleSave();
+                    setCloseWithFail(false);
+                    setShowConfirmTicketDialog(true);
+                  }}
+                  variant="contained"
+                >
+                  Cerrar caja con fallo
+                </Button>
+              )}
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+
+      <DialogLogInSupervisor
+        open={supervisionModal}
+        emailChange={setHandleChangeEmail}
+        passwordChange={setHandleChangePassword}
+        onContinue={() => handleSubmitSupervisorLogin()}
+      />
+    </>
   );
 };
 

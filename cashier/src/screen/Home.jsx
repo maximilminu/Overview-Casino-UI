@@ -1,32 +1,36 @@
-import { Outlet, useLocation, useMatches } from "react-router-dom";
+import { Outlet, useMatches } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import Footer from "../component/Footer";
 import { useRef } from "react";
 import { Box } from "@mui/system";
 import AutoDeepLinkProvider from "../context/AutoDeepLinkContext";
+import { useState } from "react";
 
 function Home() {
   const buttonsRef = useRef([]);
   const matches = useMatches();
-
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [footerHeight, setFooterHeight] = useState(0);
+  const [disable, setDisable] = useState();
   return (
     <>
-      <Navbar buttonsRef={buttonsRef} />
+      <Navbar onHeightChange={setHeaderHeight} buttonsRef={buttonsRef} />
       <Box
+        component="main"
         sx={{
           position: "fixed",
-          top: "65px",
-          bottom: "49px",
+          top: headerHeight,
+          bottom: footerHeight,
           left: 0,
           right: 0,
+          overflow: "hidden",
           backgroundColor: matches.length > 1 && "#eeeeeeb0",
-          overflow: "auto",
         }}
       >
         <AutoDeepLinkProvider />
-        <Outlet />
+        <Outlet context={[disable, setDisable]} />
       </Box>
-      <Footer />
+      <Footer disable={disable} onHeightChange={setFooterHeight} />
     </>
   );
 }

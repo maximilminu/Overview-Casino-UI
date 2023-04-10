@@ -10,15 +10,27 @@ import {
   useTheme,
   Zoom,
 } from "@mui/material";
-import { ConfigContext } from "../context/ConfigProvider";
+import { ConfigContext } from "@oc/config-context";
 import Breadcrumbs from "./Breadcrumbs";
+import { useEffect } from "react";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Footer() {
+export default function Footer(props) {
   const config = useContext(ConfigContext);
   const theme = useTheme();
   const down600px = useMediaQuery(theme.breakpoints.down("sm"));
   const routeContext = useContext(UNSAFE_RouteContext);
   const routes = routeContext.matches[0].route;
+  const navigate = useNavigate();
+  const ref = useRef(false);
+
+  useEffect(() => {
+    if (props.onHeightChange) {
+      props.onHeightChange(ref.current.offsetHeight);
+    }
+    // eslint-disable-next-line
+  }, [ref]);
 
   return (
     <>
@@ -31,6 +43,8 @@ export default function Footer() {
           top: "auto",
           bottom: 0,
         }}
+        ref={ref}
+        component="footer"
       >
         {/* Corresponding wrapper for content */}
         <Toolbar style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -45,7 +59,7 @@ export default function Footer() {
             <Link to={routes.path}>
               <Box
                 component="img"
-                src={config.Images.LogoFooter}
+                src={config?.Images?.LogoFooter}
                 sx={{
                   objectFit: "contain",
                   width: down600px ? "90px" : "120px",
@@ -70,11 +84,13 @@ export default function Footer() {
                   arrow
                   title={route.handle.breadCrumsCaption}
                 >
-                  <Link to={url}>
-                    <IconButton sx={{ color: "white" }}>
-                      {route.handle.icon}
-                    </IconButton>
-                  </Link>
+                  <IconButton
+                    onClick={() => navigate(url)}
+                    disabled={props.disable}
+                    sx={{ color: "white" }}
+                  >
+                    {route.handle.icon}
+                  </IconButton>
                 </Tooltip>
               );
             })}

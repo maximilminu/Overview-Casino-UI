@@ -52,6 +52,7 @@ const Ticket = ({ data }) => {
           direction="row"
           justifyContent="space-evenly"
           alignItems="center"
+          sx={{ marginBottom: "-20px" }}
         >
           <Grid item>
             <Typography>VALIDO POR 30 DÍAS</Typography>

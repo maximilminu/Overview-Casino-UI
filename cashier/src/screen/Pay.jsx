@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { BarcodeReaderContext } from "../context/BarcodeReaderContext";
+import { BarcodeReaderContext } from "@oc/barcode-reader-context";
 import {
   TextField,
   CircularProgress,
@@ -17,15 +16,15 @@ import {
   DialogContentText,
   DialogActions,
 } from "@mui/material";
-import { NotifyUserContext } from "../context/NotifyUserContext";
+import { NotifyUserContext } from "@oc/notify-user-context";
 import { Container } from "@mui/system";
-import { ApiContext } from "../context/ApiContext";
+import { ApiContext } from "@oc/api-context";
 import ListTickets from "../component/ListTickets";
 import Ticket from "../component/Ticket";
 import { Cancel } from "@mui/icons-material";
-import { TclPrinterContext } from "../context/TclPrinterContext";
+import { TclPrinterContext } from "@oc/tcl-printer-context";
 import { FormatLocalCurrency } from "../utils/Intl";
-
+// eslint-disable-next-line
 const Pay = ({ userMenuRef }) => {
   const { Get, Put, Post } = useContext(ApiContext);
   const { BarcodeReader } = useContext(BarcodeReaderContext);
@@ -41,7 +40,6 @@ const Pay = ({ userMenuRef }) => {
   const [payAmount, setPayAmount] = useState(0);
   const [thereArePayedTickets, setThereArePayedTickets] = useState(false);
   const [payInProcess, setPayInProcess] = useState(false);
-  const navigate = useNavigate();
   const [changeTicket, setChangeTicket] = useState();
 
   const style = {
@@ -58,30 +56,25 @@ const Pay = ({ userMenuRef }) => {
     },
   };
 
-  // userMenuRef.current = [
-  //   {
-  //     caption: "Hacer arqueo",
-  //     action: () => {
-  //       handleTicketNumberClean();
-  //       navigate("/register");
-  //     },
-  //   },
-  // ];
-
   useEffect(() => {
     if (thereArePayedTickets) {
       handleTicketNumberClean();
       return;
     }
+
     if (BarcodeReader.data) {
-      console.log(BarcodeReader.data, "data");
-      if (BarcodeReader.data.length !== 18) {
-        NotifyUser.Info("Error leyendo el ticket, reintente.");
-      } else {
+      if (BarcodeReader.data.length === 19) {
+        const number = BarcodeReader.data.toString();
+        const ticket = number.substring(0, number.length - 1);
+        setTicketNumber(ticket);
+      } else if (BarcodeReader.data.length === 18) {
         setTicketNumber(BarcodeReader.data);
+      } else {
+        NotifyUser.Info("Error leyendo el ticket, reintente.");
       }
       BarcodeReader.clear();
     }
+
     // eslint-disable-next-line
   }, [BarcodeReader.data]);
 
@@ -97,7 +90,7 @@ const Pay = ({ userMenuRef }) => {
       }
       setLoadingTicket(true);
       Get("/ticket/v1/by-number/" + ticketNumber)
-        .then((data) => {
+        .then(({ data }) => {
           setLoadingTicket(false);
           if (data.RedeemedAt) {
             setPayedTicket(data);
@@ -119,7 +112,6 @@ const Pay = ({ userMenuRef }) => {
           }
         })
         .catch((err) => {
-          console.log("ERR", err);
           switch (err.response.status) {
             case 404:
               NotifyUser.Warning(
@@ -171,16 +163,16 @@ const Pay = ({ userMenuRef }) => {
       TicketsArray: tickets,
       TicketDeVuelto: { Amount: vuelto },
     })
-      .then((res) => {
-        setChangeTicket(res);
+      .then(({ data }) => {
+        setChangeTicket(data);
         setPayInProcess(true);
 
         if (retAmount > 0.1) {
           Printer.print({
-            barCode: `${res.Barcode}`,
+            barCode: `${data.Barcode}`,
             side: "Ticket de vuelto",
             validityDays: 30,
-            value: res.Amount,
+            value: data.Amount,
             date: Date.now(),
             number: 9876543210,
             header: "Ticket de Vuelto",
@@ -192,14 +184,30 @@ const Pay = ({ userMenuRef }) => {
       })
       .catch((IDs) => {
         NotifyUser.Error("Algunos tickets no pueden ser cobrados.");
-        console.log("IDs", IDs);
       });
+  };
+
+  const reImprimir = () => {
+    if (retAmount > 0.1) {
+      Printer.print({
+        barCode: `${changeTicket.Barcode}`,
+        side: "Ticket de vuelto",
+        validityDays: 30,
+        value: changeTicket.Amount,
+        date: Date.now(),
+        number: 9876543210,
+        header: "Ticket de Vuelto",
+        titleLeft: "Av. Patricio Peralta Ramos 2100",
+        titleRight: "Mar Del Plata",
+        footer: "No valido para cobrar en caja",
+      });
+    }
   };
 
   const handleFinish = () => {
     const ID = changeTicket.ID.toString();
     Put(`/ticket/v1/to-redeem`, { ID: ID })
-      .then((res) => {
+      .then(({ data }) => {
         setPayInProcess(false);
         setTickets([]);
         setPayAmount(0);
@@ -219,10 +227,11 @@ const Pay = ({ userMenuRef }) => {
       <Container sx={{ marginTop: "20px" }}>
         <Grid
           sx={{
-            justifyContent: "center",
+            justifyContent: "space-between",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            width: "100%",
           }}
           xl={12}
           spacing={2}
@@ -243,8 +252,6 @@ const Pay = ({ userMenuRef }) => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  marginLeft: 1,
-                  marginRight: 3,
                 }}
               >
                 <Typography>Cantidad:</Typography>
@@ -265,11 +272,7 @@ const Pay = ({ userMenuRef }) => {
                   {FormatLocalCurrency(totalAmount)}
                 </Typography>
               </Grid>
-              <Divider
-                orientation="vertical"
-                flexItem
-                sx={{ marginLeft: 1, marginRight: 3 }}
-              />
+              <Divider orientation="vertical" flexItem sx={{ margin: 1 }} />
               <Grid
                 item
                 sx={{
@@ -328,7 +331,7 @@ const Pay = ({ userMenuRef }) => {
               onClick={handlePay}
             >
               <Typography>Pagar</Typography>
-              <Typography variant="h3">
+              <Typography variant="h4">
                 {FormatLocalCurrency(payAmount)}
               </Typography>
             </Button>
@@ -385,7 +388,6 @@ const Pay = ({ userMenuRef }) => {
         <DialogActions
           sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
         >
-          <Button onClick={() => setPayInProcess(false)}>Cancelar</Button>
           <Button
             variant="outlined"
             sx={{
@@ -393,7 +395,7 @@ const Pay = ({ userMenuRef }) => {
               "&:hover": { backgroundColor: "secondary.main" },
               width: "80%",
             }}
-            onClick={handleFinish}
+            onClick={reImprimir}
           >
             Re-imprimir ticket
           </Button>

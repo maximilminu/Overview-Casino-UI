@@ -19,58 +19,13 @@ import {
 import BarcodeReaderButton from "./Button/BarcodeReaderButton";
 import TclPrinterButton from "./Button/TclPrinterButton";
 import EscPosPrinterButton from "./Button/EscPosPrinterButton";
-import { ApiContext } from "../context/ApiContext";
-import { UserContext } from "../context/UserProvider";
+import { ApiContext } from "@oc/api-context";
+import { UserContext } from "@oc/user-context";
 import styled from "@emotion/styled";
 import packageJson from "../../package.json";
-import { ConfigContext } from "../context/ConfigProvider";
-
-// const Search = styled("div")(({ theme }) => ({
-//   position: "relative",
-//   borderRadius: theme.shape.borderRadius,
-//   backgroundColor: alpha(theme.palette.common.white, 0.15),
-//   "&:hover": {
-//     backgroundColor: alpha(theme.palette.common.white, 0.25),
-//   },
-
-//   marginLeft: "20px",
-//   width: "100%",
-//   [theme.breakpoints.up("sm")]: {
-//     marginLeft: theme.spacing(1),
-//     width: "auto",
-//   },
-// }));
-
-// const SearchIconWrapper = styled("div")(({ theme }) => ({
-//   padding: theme.spacing(0, 2),
-//   height: "100%",
-//   position: "absolute",
-//   pointerEvents: "none",
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "center",
-//   marginRight: "15px",
-// }));
-
-// const StyledTextField = styled(TextField)(({ theme }) => ({
-//   color: "inherit",
-//   "& .MuiInputBase-input": {
-//     padding: theme.spacing(1, 1, 1, 0),
-//     // vertical padding + font size from searchIcon
-//     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-
-//     transition: theme.transitions.create("width"),
-//     width: "100%",
-//     [theme.breakpoints.up("sm")]: {
-//       width: "30vw",
-//       "&:focus": {
-//         width: "30vw",
-//       },
-//     },
-//   },
-
-//   "&	.MuiOutlinedInput-root": { color: "inherit" },
-// }));
+import { ConfigContext } from "@oc/config-context";
+import { useRef } from "react";
+import { useEffect } from "react";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -85,7 +40,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const Navbar = ({ buttonsRef }) => {
+const Navbar = (props) => {
   const config = React.useContext(ConfigContext);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { Logout } = React.useContext(ApiContext);
@@ -94,6 +49,14 @@ const Navbar = ({ buttonsRef }) => {
   const down600px = useMediaQuery(theme.breakpoints.down("sm"));
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const ref = useRef(false);
+
+  useEffect(() => {
+    if (props.onHeightChange) {
+      props.onHeightChange(ref.current.offsetHeight);
+    }
+    // eslint-disable-next-line
+  }, [ref]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -116,12 +79,9 @@ const Navbar = ({ buttonsRef }) => {
     <AppBar
       sx={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "black",
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
+      ref={ref}
     >
       <Toolbar sx={{ height: "7vh", backgroundColor: "#1c1c1d" }}>
         {packageJson.version.includes("rc") ? (

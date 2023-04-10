@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import {
   BarcodeReaderContext,
   READER_STATUS_OFFLINE,
-} from "../../context/BarcodeReaderContext";
+} from "@oc/barcode-reader-context";
 import { IconButton, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { QrCodeScanner } from "@mui/icons-material";
 

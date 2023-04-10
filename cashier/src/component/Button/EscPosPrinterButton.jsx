@@ -3,7 +3,7 @@ import { Print } from "@mui/icons-material";
 import {
   EscPosPrinterContext,
   PRINTER_STATUS_OFFLINE,
-} from "../../context/EscPosPrinterContext";
+} from "@oc/escpos-printer-context";
 import { IconButton, Typography, useTheme, useMediaQuery } from "@mui/material";
 
 const PrinterButton = () => {

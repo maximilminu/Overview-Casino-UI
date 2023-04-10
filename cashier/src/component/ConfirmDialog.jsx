@@ -1,40 +1,63 @@
-import React from 'react';
+import React from "react";
 import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-} from '@mui/material';
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
-const ConfirmDialog = React.memo(({ open, onClose, onConfirm, onCancel, title, content }) => {
+const ConfirmDialog = React.memo(
+  ({
+    open,
+    onConfirm,
+    onFinishOperation,
+    title,
+    textFirstButton,
+    textSecondButton,
+  }) => {
     return (
-        <Dialog
-            open={open}
-            keepMounted
-            onClose={onClose}
-            aria-labelledby='alert-dialog-confirmdelete-title'
-            aria-describedby='alert-dialog-confirmdelete-description'
+      <Dialog
+        open={open}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer - 200 }}
+        fullWidth={true}
+        maxWidth="xs"
+      >
+        <DialogTitle id="alert-dialog-confirmdelete-title">{title}</DialogTitle>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "20px",
+            marginBottom: "25px",
+          }}
         >
-            <DialogTitle id='alert-dialog-confirmdelete-title'>
-                {title}
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id='alert-dialog-confirmdelete-description'>
-                    {content}
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onCancel} color='primary'>
-                    No, cancelar.
-                </Button>
-                <Button onClick={onConfirm} color='warning'>
-                    ¡Sí, proceder!
-                </Button>
-            </DialogActions>
-        </Dialog>
+          <Button
+            onClick={() => onConfirm()}
+            autoFocus
+            sx={{ width: "50%" }}
+            variant="outlined"
+          >
+            {textFirstButton}
+          </Button>
+          <Button
+            onClick={() => onFinishOperation()}
+            sx={{
+              width: "70%",
+            }}
+            autoFocus
+            variant="contained"
+          >
+            {textSecondButton}
+          </Button>
+        </Box>
+      </Dialog>
     );
-});
+  }
+);
 
 export default ConfirmDialog;
