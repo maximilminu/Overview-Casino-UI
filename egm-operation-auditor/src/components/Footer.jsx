@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Link, UNSAFE_RouteContext } from "react-router-dom";
 import {
   Box,
@@ -10,16 +10,23 @@ import {
   useTheme,
   Zoom,
 } from "@mui/material";
-import { ConfigContext } from "../context/ConfigProvider";
+import { ConfigContext } from "@oc/config-context";
 import Breadcrumbs from "./Breadcrumbs";
 
-export default function Footer() {
+export default function Footer(props) {
   const config = useContext(ConfigContext);
   const theme = useTheme();
   const down600px = useMediaQuery(theme.breakpoints.down("sm"));
   const routeContext = useContext(UNSAFE_RouteContext);
   const routes = routeContext.matches[0].route;
-  console.log(routes.children);
+  const ref = useRef(false);
+  useEffect(() => {
+    if (props.onHeightChange) {
+      props.onHeightChange(ref.current.offsetHeight);
+    }
+    // eslint-disable-next-line
+  }, [ref]);
+
   return (
     <>
       {/* Footer where info will be placed inside */}
@@ -31,6 +38,8 @@ export default function Footer() {
           top: "auto",
           bottom: 0,
         }}
+        ref={ref}
+        component="footer"
       >
         {/* Corresponding wrapper for content */}
         <Toolbar style={{ display: "flex", justifyContent: "flex-end" }}>

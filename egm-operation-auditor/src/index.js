@@ -1,16 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import Router from "./Router";
-import { BarcodeReaderProvider } from "./context/BarcodeReaderContext";
-import { ApiProvider } from "./context/ApiContext";
-import { NotifyUserProvider } from "./context/NotifyUserContext";
+import { ConfigProvider } from "@oc/config-context";
+import { EscPosPrinterProvider } from "@oc/escpos-printer-context";
+import { BarcodeReaderProvider } from "@oc/barcode-reader-context";
+import { NotifyUserProvider } from "@oc/notify-user-context";
 import { SnackbarProvider } from "notistack";
-import ConfigProvider from "./context/ConfigProvider";
-import { ThemeProvider } from "./context/ThemeProvider";
-import { EscPosPrinterProvider } from "./context/EscPosPrinterContext";
-import UserProvider from "./context/UserProvider";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { ThemeProvider } from "@oc/theme-context";
+import { ApiProvider } from "@oc/api-context";
+import UserProvider from "@oc/user-context";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "dayjs/locale/es-mx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -22,9 +23,14 @@ root.render(
           <ThemeProvider>
             <UserProvider>
               <EscPosPrinterProvider>
-                <BarcodeReaderProvider>
-                  <Router />
-                </BarcodeReaderProvider>
+                <LocalizationProvider
+                  adapterLocale="es-mx"
+                  dateAdapter={AdapterDayjs}
+                >
+                  <BarcodeReaderProvider>
+                    <Router />
+                  </BarcodeReaderProvider>
+                </LocalizationProvider>
               </EscPosPrinterProvider>
             </UserProvider>
           </ThemeProvider>

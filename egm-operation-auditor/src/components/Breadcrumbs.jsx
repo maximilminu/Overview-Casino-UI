@@ -9,7 +9,7 @@ const Breadcrumbs = () => {
   return (
     <MUIBreadcrumbs aria-label="breadcrumb" sx={{ color: "white" }}>
       {matches.map((element) => (
-        <>
+        <div key={element.pathname}>
           {element.pathname === url ? (
             <Typography sx={{ color: "white" }}>
               {element.handle?.breadCrumsCaption}
@@ -19,7 +19,7 @@ const Breadcrumbs = () => {
               {element.handle?.breadCrumsCaption}
             </Link>
           )}
-        </>
+        </div>
       ))}
     </MUIBreadcrumbs>
   );

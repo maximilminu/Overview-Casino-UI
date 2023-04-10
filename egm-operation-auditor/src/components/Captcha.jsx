@@ -63,22 +63,43 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
         }}
         aria-labelledby="alert-dialog-title"
       >
-        <Typography
-          variant="h3"
+        <Box
           sx={{
-            fontFamily: "Apple Color Emoji",
-            textAlign: "center",
-            fontWeight: "700",
-            fontSize: "25px",
-            color: "white",
-            fontStyle: "italic",
             background:
               "radial-gradient(circle, rgba(24,97,49,1) 43%, rgba(43,57,45,1) 100%)",
-            padding: "15px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          {title} {randomNumber}
-        </Typography>
+          <Typography
+            variant="h3"
+            sx={{
+              fontFamily: "Apple Color Emoji",
+              textAlign: "left",
+              fontWeight: "700",
+              fontSize: "25px",
+              color: "white",
+              fontStyle: "italic",
+              padding: "15px",
+            }}
+          >
+            {title}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: "Apple Color Emoji",
+              textAlign: "right",
+              fontWeight: "700",
+              fontSize: "40px",
+              color: "white",
+              fontStyle: "italic",
+            }}
+          >
+            {randomNumber}
+          </Typography>
+        </Box>
         <Box
           sx={{
             margin: " 0 auto",
@@ -1323,7 +1344,7 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
             }}
             id="alert-dialog-title"
           >
-            Clickeaste mal el número indicado
+            EL NÚMERO SELECCIONADO NO COINCIDE
           </DialogTitle>
         </Box>
         <DialogContent>
@@ -1336,8 +1357,8 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
             }}
             id="alert-dialog-description"
           >
-            Por favor prestá atención, para poder autorizar el ticket tenes que
-            seleccionar el número correcto.
+            Para autorizar, seleccione el número en el paño que coincida con el
+            propuesto.
           </DialogContentText>
           <Box sx={{ width: "100%" }}>
             <LinearProgress

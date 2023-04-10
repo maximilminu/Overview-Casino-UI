@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -21,11 +21,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import packageJson from "../../package.json";
 import BarcodeButton from "./Buttons/BarcodeButton";
 import { Cancel } from "@mui/icons-material";
-import { ConfigContext } from "../context/ConfigProvider";
+import { ConfigContext } from "@oc/config-context";
 import { useContext } from "react";
-import { UserContext } from "../context/UserProvider";
+import { UserContext } from "@oc/user-context";
 import Avatar from "./Avatar";
-import { ApiContext } from "../context/ApiContext";
+import { ApiContext } from "@oc/api-context";
 import { useParams, useNavigate } from "react-router-dom";
 import Search from "./Search";
 
@@ -89,7 +89,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const Navbar = () => {
+const Navbar = (props) => {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const config = useContext(ConfigContext);
   const theme = useTheme();
@@ -100,7 +100,8 @@ const Navbar = () => {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const { Logout } = useContext(ApiContext);
-  const { numberTiket } = useParams();
+  const { number } = useParams();
+  const ref = useRef(false);
 
   const handleTicketNumberClean = () => {
     setValueTicket("");
@@ -115,12 +116,12 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (numberTiket) {
-      setValueTicket(numberTiket);
+    if (number) {
+      setValueTicket(number);
     } else {
       setValueTicket("");
     }
-  }, [numberTiket]);
+  }, [number]);
 
   const handleTicketNumberChange = (ev) => {
     setValueTicket(ev.target.value);
@@ -139,14 +140,20 @@ const Navbar = () => {
     Logout();
   };
 
+  useEffect(() => {
+    if (props.onHeightChange) {
+      props.onHeightChange(ref.current.offsetHeight);
+    }
+    // eslint-disable-next-line
+  }, [ref]);
+
   return (
     <AppBar
       sx={{
         position: "fixed",
-        marginBottom: "40px",
-        width: "100%",
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
+      ref={ref}
     >
       <Toolbar
         sx={{

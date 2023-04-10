@@ -4,13 +4,12 @@ import { QrCodeScanner } from "@mui/icons-material";
 import {
   BarcodeReaderContext,
   READER_STATUS_OFFLINE,
-} from "../../context/BarcodeReaderContext";
+} from "@oc/barcode-reader-context";
 import { IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 const BarcodeButton = () => {
   const theme = useTheme();
   const down600px = useMediaQuery(theme.breakpoints.down("sm"));
-
   const { BarcodeReader } = useContext(BarcodeReaderContext);
 
   return (

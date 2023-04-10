@@ -8,7 +8,7 @@ function Router() {
       handle: {
         breadCrumsCaption: "Detalle",
       },
-      path: "ticket/:numberTiket",
+      path: "ticket/:number",
       element: <Ticket />,
     },
   ];

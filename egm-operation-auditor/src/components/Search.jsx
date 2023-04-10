@@ -3,7 +3,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { TextField, Box, InputAdornment, IconButton } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import { Cancel } from "@mui/icons-material";
-import Typing from './Spinner/typing/Typing'
+import Typing from "./Spinner/typing/Typing";
 import debounce from "lodash.debounce";
 
 const StyledContainer = styled("div")(({ theme }) => ({
@@ -50,7 +50,14 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   "&	.MuiOutlinedInput-root": { color: "inherit" },
 }));
 
-const Search = ({onEmpty,onSearch,onStartTyping,value,minChars = 2,debounceTimeout = 750}) => {
+const Search = ({
+  onEmpty,
+  onSearch,
+  onStartTyping,
+  value,
+  minChars = 2,
+  debounceTimeout = 750,
+}) => {
   const [typing, setTyping] = useState(false);
   const [searchText, setSearchText] = useState("");
 
@@ -84,18 +91,18 @@ const Search = ({onEmpty,onSearch,onStartTyping,value,minChars = 2,debounceTimeo
   };
 
   useEffect(() => {
-    if(value===""){
-        setSearchText("")
-    } 
+    if (value === "") {
+      setSearchText("");
+    }
     if (value) {
-        setSearchText(value);
-        if (value.length >= minChars) {
+      setSearchText(value);
+      if (value.length >= minChars) {
         onSearch(value);
-        } else {
+      } else {
         if (onEmpty) {
-            onEmpty();
+          onEmpty();
         }
-        }
+      }
     }
     // eslint-disable-next-line
   }, [value]);
@@ -111,7 +118,7 @@ const Search = ({onEmpty,onSearch,onStartTyping,value,minChars = 2,debounceTimeo
           autoComplete="off"
           value={searchText}
           onChange={handleSearchChange}
-          placeholder="Buscar…"
+          placeholder="Ingresa el número del ticket..."
           inputProps={{ "aria-label": "search" }}
           InputProps={{
             "aria-label": "search",
