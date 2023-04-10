@@ -1,0 +1,17 @@
+{
+	"name": "@oc/local-format-util",
+	"version": "1.0.0",
+	"main": "dist/local-format-util.js",
+	"repository": "git@gitlab.sistematis.com.ar:OC/ui/web/lib/local-format-util.git",
+	"author": "Fausto Rossi <frossi@tecnoazar.com.ar>",
+	"license": "MIT",
+	"scripts": {
+		"build": "NODE_ENV=production babel src --out-dir dist",
+		"prepublish": "yarn build"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
+		"babel-preset-react": "^6.24.1"
+	}
+}

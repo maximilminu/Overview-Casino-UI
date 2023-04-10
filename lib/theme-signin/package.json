@@ -1,0 +1,23 @@
+{
+	"name": "@oc/theme-signin",
+	"version": "1.0.3",
+	"main": "dist/theme.js",
+	"repository": "git@gitlab.sistematis.com.ar:OC/ui/web/lib/theme-signin.git",
+	"author": "Fausto Rossi <frossi@tecnoazar.com.ar>",
+	"license": "MIT",
+	"scripts": {
+		"build": "NODE_ENV=production babel src --out-dir dist",
+		"prepublish": "yarn build"
+	},
+	"dependencies": {
+		"@mui/material": "^5.11.16",
+		"@mui/system": "^5.11.16",
+		"@oc/config-signin": "^1.0.1",
+		"react": "^18.2.0"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
+		"babel-preset-react": "^6.24.1"
+	}
+}

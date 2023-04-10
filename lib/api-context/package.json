@@ -1,0 +1,25 @@
+{
+	"name": "@oc/api-context",
+	"version": "1.0.16",
+	"main": "dist/api-context.js",
+	"repository": "https://gitlab.sistematis.com.ar/OC/ui/web/lib/api-context",
+	"license": "MIT",
+	"scripts": {
+		"build": "NODE_ENV=production babel src --out-dir dist",
+		"prepublish": "yarn build"
+	},
+	"dependencies": {
+		"@oc/notify-user-context": "^1.0.3",
+		"axios": "^1.2.3",
+		"react": "^18.2.0",
+		"react-cookie": "^4.1.1",
+		"react-use-localstorage": "^3.5.3"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-plugin-require-context-hook": "^1.0.0",
+		"babel-preset-env": "^1.7.0",
+		"babel-preset-es2015": "^6.24.1",
+		"babel-preset-react": "^6.24.1"
+	}
+}

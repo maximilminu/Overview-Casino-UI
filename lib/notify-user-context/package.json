@@ -1,0 +1,21 @@
+{
+	"name": "@oc/notify-user-context",
+	"version": "1.0.2",
+	"main": "dist/notify-user-context.js",
+	"repository": "https://gitlab.sistematis.com.ar/OC/ui/web/lib/notify-user-context",
+	"license": "MIT",
+	"scripts": {
+		"build": "NODE_ENV=production babel src --out-dir dist",
+		"prepublish": "yarn build"
+	},
+	"dependencies": {
+		"notistack": "^2.0.8",
+		"react": "^18.2.0"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-plugin-require-context-hook": "^1.0.0",
+		"babel-preset-env": "^1.7.0",
+		"babel-preset-react": "^6.24.1"
+	}
+}
