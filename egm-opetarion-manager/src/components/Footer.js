@@ -10,7 +10,7 @@ import {
 	useTheme,
 	Zoom,
 } from "@mui/material";
-import { ConfigContext } from "../context/ConfigProvider";
+import { ConfigContext } from "@oc/config-context";
 import Breadcrumbs from "./Breadcrumbs";
 
 export default function Footer() {

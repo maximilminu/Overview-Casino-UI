@@ -1,32 +1,37 @@
-import React, { useContext } from "react";
+import React, { useEffect } from "react";
 
 import { Grid, Paper, Typography, Box } from "@mui/material";
 import Barcode from "react-barcode";
-import { TicketDataCOntext } from "../context/TicketData";
 
-const TicketUI = ({ formatShortMonth, parseDate }) => {
-	const { ticket } = useContext(TicketDataCOntext);
-	const style = {
-		paperTicket: {
-			backgroundColor: "white",
-			color: "black",
-			width: { xs: "24.375rem", md: "33rem" },
-			position: "relative",
-			marginLeft: "auto",
-			marginRight: "auto",
-			padding: { xs: "5px", md: "30px" },
-			marginTop: "15px",
-		},
-	};
+import { useNavigate } from "react-router";
 
-	const value = +ticket?.Amount;
-	const parsedValue = value?.toLocaleString("es-AR", {
-		minimumFractionDigits: 2,
-	});
+const style = {
+	paperTicket: {
+		backgroundColor: "white",
+		color: "black",
+		width: { xs: "24.375rem", md: "33rem" },
+		position: "relative",
+		marginLeft: "auto",
+		marginRight: "auto",
+		padding: { xs: "5px", md: "30px" },
+		marginTop: "15px",
+	},
+};
 
-	const formatMonth = formatShortMonth(ticket?.PrintedAt);
+const TicketUI = ({
+	parsedDate,
+	formatMonth,
+	parsedValue,
+	machineID,
+	BarcodeValue,
+}) => {
+	const navigate = useNavigate();
 
-	const parsedDate = parseDate(formatMonth);
+	useEffect(() => {
+		!BarcodeValue && navigate("/egm-operation-manager");
+
+		//eslint-disable-next-line
+	}, [BarcodeValue]);
 
 	return (
 		<Box sx={{ padding: { xs: 2, md: 8 } }}>
@@ -83,7 +88,7 @@ const TicketUI = ({ formatShortMonth, parseDate }) => {
 								alignItems="center"
 							>
 								{" "}
-								<Barcode width={1} height={60} value={ticket?.Barcode} />{" "}
+								<Barcode width={1} height={60} value={BarcodeValue} />{" "}
 							</Grid>
 
 							<Grid item>
@@ -127,7 +132,7 @@ const TicketUI = ({ formatShortMonth, parseDate }) => {
 								<Typography>
 									MAQUINA N°
 									<br />
-									{ticket?.PrintedIn}
+									{machineID}
 								</Typography>
 							</Grid>
 

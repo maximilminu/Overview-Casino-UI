@@ -4,7 +4,7 @@ import { IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import {
 	EscPosPrinterContext,
 	PRINTER_STATUS_OFFLINE,
-} from "../context/EscPosPrinterContext";
+} from "@oc/escpos-printer-context";
 
 const PrinterButton = () => {
 	const { Printer } = useContext(EscPosPrinterContext);
@@ -18,9 +18,9 @@ const PrinterButton = () => {
 				if (Printer.status === PRINTER_STATUS_OFFLINE) {
 					Printer.connect();
 				}
-				if (!Printer.status === PRINTER_STATUS_OFFLINE) {
-					Printer.demo();
-				}
+				// if (!Printer.status === PRINTER_STATUS_OFFLINE) {
+				// 	Printer.demo();
+				// }
 			}}
 		>
 			<Print

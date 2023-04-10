@@ -13,14 +13,15 @@ import { Container } from "@mui/system";
 import React, { useContext, useEffect, useState } from "react";
 import Roulette from "../components/Spinner/Roulette";
 import { TicketDataCOntext } from "../context/TicketData";
-import { ApiContext } from "../context/ApiContext";
-import { NotifyUserContext } from "../context/NotifyUserContext";
+import { ApiContext } from "@oc/api-context";
+import { NotifyUserContext } from "@oc/notify-user-context";
 import { Outlet, useNavigate, useOutlet } from "react-router";
 import PaidIcon from "@mui/icons-material/Paid";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import NumbersIcon from "@mui/icons-material/Numbers";
 
 import dayjs from "dayjs";
+import { debounce } from "lodash";
 
 const Home = () => {
 	const ifOutlet = useOutlet();
@@ -46,7 +47,20 @@ const Home = () => {
 	};
 	const handleChangeAmount = (e) => {
 		e.preventDefault();
-		setData({ ...data, [e.target.id]: +e.target.value });
+
+		const { value } = e.target;
+		const newValue = value.replace(/,/g, ".");
+
+		setData({ ...data, [e.target.id]: newValue });
+	};
+
+	const handleKeyPressAmount = (e) => {
+		const allowedChars = /[0-9.,]/;
+		const charCode = e.charCode;
+		const char = String.fromCharCode(charCode);
+		if (!allowedChars.test(char)) {
+			e.preventDefault();
+		}
 	};
 
 	// MACHINE Search
@@ -70,22 +84,34 @@ const Home = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+
 		getTicket();
+	};
+
+	const validate = (data) => {
+		const amountString = data?.Amount?.toString();
+		return (
+			amountString?.length > 2 &&
+			data?.Barcode?.length > 3 &&
+			data?.PrintedIn?.length > 3
+		);
 	};
 
 	const getTicket = () => {
 		Get(
 			`/ticket/v1/search/?PrintedIn=${data.PrintedIn}&Barcode=${data.Barcode}&Amount=${data.Amount}&Date=${data?.Date}`
 		)
-			.then((res) => {
-				if (res.length !== 0) {
-					setTicket(res[0]);
+			.then(({ data }) => {
+				if (data[0].Status === 10) {
+					NotifyUser.Warning("Este ticket ya fue reemplazado por muleto");
+				} else if (data.length !== 0) {
 					setLoading(true);
+					setTicket(data[0]);
 
 					setTimeout(() => {
 						navigate("ticket-print");
 						setLoading(false);
-					}, 700);
+					}, 2000);
 				} else NotifyUser.Error("No se pudo encontrar el ticket.");
 			})
 			.catch((err) => {
@@ -94,17 +120,26 @@ const Home = () => {
 	};
 
 	useEffect(() => {
-		if (data?.PrintedIn?.length >= 6) {
-			setLoadingApi(true);
-			Get(`/machines/v1/autocomplete/?ID=${data?.PrintedIn}`)
-				.then((res) => {
-					const machineIDs = res.map((machine) => machine.Describe);
+		const delayedSearch = debounce(() => {
+			if (data?.PrintedIn?.length >= 4) {
+				setLoadingApi(true);
+				setTimeout(() => {
+					Get(`/machines/v1/autocomplete/?ID=${data?.PrintedIn}`)
+						.then(({ data }) => {
+							const machineIDs = data.map((machine) => machine.Describe);
+							setMachines(machineIDs.flat());
+						})
+						.catch((err) => console.log(err))
+						.finally(() => setLoadingApi(false));
+				}, 500);
+			}
+		}, 800);
 
-					setMachines(machineIDs.flat());
-				})
-				.catch((err) => console.log(err));
-		}
-		// eslint-disable-next-line
+		delayedSearch();
+
+		return delayedSearch.cancel;
+
+		//eslint-disable-next-line
 	}, [data]);
 
 	return ifOutlet ? (
@@ -129,7 +164,7 @@ const Home = () => {
 						gutterBottom
 						sx={{ textAlign: "center", marginBottom: "2rem" }}
 					>
-						Pago Irregular
+						Pago Irregular de Ticket
 					</Typography>
 
 					<Box sx={{ width: "60rem" }}>
@@ -146,7 +181,10 @@ const Home = () => {
 							<Autocomplete
 								id="PrintedIn"
 								options={machines}
+								clearOnBlur={true}
 								includeInputInList
+								autoHighlight
+								noOptionsText="Comience a escribir para buscar "
 								sx={{ margin: ".5rem", width: "45%" }}
 								value={machineNumber}
 								onChange={(e, newValue) => {
@@ -160,7 +198,7 @@ const Home = () => {
 								renderInput={(params) => (
 									<TextField
 										{...params}
-										label="Número de Maquina"
+										label="Número de Máquina"
 										variant="standard"
 									/>
 								)}
@@ -173,7 +211,19 @@ const Home = () => {
 								onChange={handleChange}
 								label="Número de Ticket"
 								variant="standard"
-								sx={{ margin: ".5rem", width: "45%" }}
+								type="number"
+								sx={{
+									margin: ".5rem",
+									width: "45%",
+									'input[type="number"]::-webkit-inner-spin-button': {
+										WebkitAppearance: "none",
+										margin: 0,
+									},
+									'input[type="number"]::-webkit-outer-spin-button': {
+										WebkitAppearance: "none",
+										margin: 0,
+									},
+								}}
 								InputProps={{
 									endAdornment: (
 										<InputAdornment position="end">
@@ -189,8 +239,20 @@ const Home = () => {
 								id="Amount"
 								onChange={handleChangeAmount}
 								label="Monto"
+								onKeyPress={handleKeyPressAmount}
 								variant="standard"
-								sx={{ margin: ".5rem", width: "45%" }}
+								sx={{
+									margin: ".5rem",
+									width: "45%",
+									'input[type="number"]::-webkit-inner-spin-button': {
+										WebkitAppearance: "none",
+										margin: 0,
+									},
+									'input[type="number"]::-webkit-outer-spin-button': {
+										WebkitAppearance: "none",
+										margin: 0,
+									},
+								}}
 								InputProps={{
 									endAdornment: (
 										<InputAdornment position="end">
@@ -200,10 +262,10 @@ const Home = () => {
 								}}
 							/>
 							<DateTimePicker
-								label="Hora y Fecha"
+								label="Fecha y Hora  "
 								disableFuture
-								ampm
 								openTo="day"
+								ampm
 								renderInput={(props) => (
 									<TextField
 										{...props}
@@ -220,7 +282,7 @@ const Home = () => {
 									variant="contained"
 									sx={style.button}
 									color="error"
-									// disabled={!validate()}
+									disabled={!validate(data)}
 									type="submit"
 									onClick={handleSubmit}
 								>

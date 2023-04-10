@@ -1,29 +1,33 @@
 import React, { useContext, useState } from "react";
-import { Button, Box } from "@mui/material";
+import { Button, Box, Typography } from "@mui/material";
 
 import { TicketDataCOntext } from "../context/TicketData";
 import {
 	EscPosPrinterContext,
 	PRINTER_STATUS_OFFLINE,
-} from "../context/EscPosPrinterContext";
-import { NotifyUserContext } from "../context/NotifyUserContext";
+} from "@oc/escpos-printer-context";
+import { NotifyUserContext } from "@oc/notify-user-context";
 import DialogConfirm from "./DialogConfirm";
 import { LoadingButton } from "@mui/lab";
 import MotiveModal from "./MotiveModal";
-import { ApiContext } from "../context/ApiContext";
+import { ApiContext } from "@oc/api-context";
 import { useNavigate } from "react-router";
+import jwt_decode from "jwt-decode";
 const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 	const [showModal, setShowModal] = useState(false);
 	const [date, setDate] = useState();
 	const [ticketData, setTicketData] = useState();
 	const [motive, setMotive] = useState("");
 	const [open, setOpen] = useState(false);
-	const [count, setCount] = useState(1);
+	const [count, setCount] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const { ticket, setTicket } = useContext(TicketDataCOntext);
 	const { Post } = useContext(ApiContext);
 	const { Printer } = useContext(EscPosPrinterContext);
 	const NotifyUser = useContext(NotifyUserContext);
+	const AccessToken = localStorage.getItem("AccessToken");
+	const token = AccessToken;
+	const decoded = token && jwt_decode(token);
 
 	const value = +ticketData?.Amount;
 	const parsedValue = value?.toLocaleString("es-AR", {
@@ -67,11 +71,8 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 						.size(2, 3)
 						.text("VALE EN EFECTIVO")
 						.feed(1)
-						.feed(1)
-						.barcode(`${formatBcode}`, "ITF", {
-							width: 2,
-							position: "off",
-						})
+
+						.raster(Printer.barcode(formatBcode))
 						.feed(1)
 						.size(0, 0)
 						.text(`${Barcode}`)
@@ -115,38 +116,18 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 							"cp857"
 						)
 
+						.align("lt")
 						.feed(2)
-						.tableCustom(
-							[
-								{
-									text: "AUTORIZA:",
-									align: "CENTER",
-									width: 1,
-								},
-								{
-									text: `LEGAJO: `,
-									align: "CENter",
-									width: 1,
-								},
-							],
-							"cp857"
-						)
+						.text(`CREADO POR:                             FIRMA`)
 						.feed(1)
-						.tableCustom(
-							[
-								{
-									text: "______________",
-									align: "CENTER",
-									width: 1,
-								},
-								{
-									text: "______________",
-									align: "CENter",
-									width: 1,
-								},
-							],
-							"cp857"
-						)
+						.text(`${decoded.Profile.FullName}`)
+						.text("________________________________________________")
+						.feed(2)
+						.text("AUTORIZADO POR:                         FIRMA")
+						.feed(2)
+						.text("________________________________________________")
+
+						.align("ct")
 						.feed(2)
 						.size(1, 0)
 						.text("Solo cobrar por caja");
@@ -185,10 +166,7 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 						.text("VALE EN EFECTIVO")
 						.feed(1)
 						.feed(1)
-						.barcode(`${formatBcode}`, "ITF", {
-							width: 2,
-							position: "off",
-						})
+						.raster(Printer.barcode(formatBcode))
 						.feed(1)
 						.size(0, 0)
 						.text(`${ticketData?.Barcode}`)
@@ -232,41 +210,22 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 							"cp857"
 						)
 
+						.align("lt")
 						.feed(2)
-						.tableCustom(
-							[
-								{
-									text: "AUTORIZA:",
-									align: "CENTER",
-									width: 1,
-								},
-								{
-									text: `LEGAJO: `,
-									align: "CENter",
-									width: 1,
-								},
-							],
-							"cp857"
-						)
+						.text(`CREADO POR:                             FIRMA`)
 						.feed(1)
-						.tableCustom(
-							[
-								{
-									text: "______________",
-									align: "CENTER",
-									width: 1,
-								},
-								{
-									text: "______________",
-									align: "CENter",
-									width: 1,
-								},
-							],
-							"cp857"
-						)
+						.text(`${decoded.Profile.FullName}`)
+						.text("________________________________________________")
+						.feed(2)
+						.text("AUTORIZADO POR:                         FIRMA")
+						.feed(2)
+						.text("________________________________________________")
+
+						.align("ct")
 						.feed(2)
 						.size(1, 0)
 						.text("Solo cobrar por caja")
+
 						.feed(2)
 						.size(0, 0)
 						.text(`${"Re-impresion N°" + count}`);
@@ -290,14 +249,14 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 
 	const handlePrint = () => {
 		Post(`/ticket/v1/replace`, { ID: ticket.ID, Notes: motive })
-			.then((res) => {
+			.then(({ data }) => {
 				setCount((prevState) => prevState + 1);
-				setTicketData(res);
-				handlePrintTicket(res);
+				setTicketData(data);
+				handlePrintTicket(data);
 				handleClose();
 			})
 			.catch((err) => {
-				NotifyUser.Error("El estado del ticket no fue actualizado");
+				NotifyUser.Error("El ticket ya fue reemplazado por muleto");
 				console.log(err);
 			});
 	};
@@ -319,13 +278,13 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 
 	const styles = {
 		button: {
-			fontSize: count > 1 ? "20px" : "13px",
-			width: count > 1 ? "80%" : "60%",
-			height: count > 1 && "4rem",
+			fontSize: count >= 1 ? "20px" : "13px",
+			width: count >= 1 ? "80%" : "60%",
+			height: count >= 1 && "4rem",
 			color: "third.main",
-			backgroundColor: count > 1 ? "#318b35f0" : "secondary.main",
+			backgroundColor: count >= 1 ? "#318b35f0" : "secondary.main",
 			"&:hover": {
-				backgroundColor: count > 1 ? "#226126" : "#222422",
+				backgroundColor: count >= 1 ? "#226126" : "#222422",
 			},
 		},
 	};
@@ -349,26 +308,33 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 				<Button
 					variant="contained"
 					handleCancelOperation
-					onClick={count > 1 ? handleDonePrinting : handleCancelOperation}
+					onClick={count >= 1 ? handleDonePrinting : handleCancelOperation}
 					sx={styles.button}
 				>
-					{count > 1 ? "Confirmar Operación" : "Cancelar"}
+					{count >= 1 ? "Confirmar Operación" : "Cancelar"}
 				</Button>
-				<LoadingButton
-					variant="contained"
-					loading={loading}
-					onClick={count > 1 ? handlePrintTicketAgain : handleOpenModal}
-					sx={{
-						backgroundColor: "primary.main",
-						fontSize: count > 1 ? "15px" : "20px",
-						width: "80%",
-						height: count > 1 && "3rem",
-					}}
-				>
-					{count >= 2
-						? "Re-imprimir Ticket Muleto"
-						: "Reemplazar por Ticket Muleto"}
-				</LoadingButton>
+				<Box sx={{ width: "100%", textAlign: "center" }}>
+					<LoadingButton
+						variant="contained"
+						loading={loading}
+						onClick={count >= 1 ? handlePrintTicketAgain : handleOpenModal}
+						sx={{
+							backgroundColor: "primary.main",
+							fontSize: count >= 1 ? "15px" : "20px",
+							width: "80%",
+							height: count >= 1 && "3rem",
+						}}
+					>
+						{count >= 1
+							? "Re-imprimir Ticket Muleto"
+							: "Reemplazar por Ticket Muleto"}
+					</LoadingButton>
+					{loading && (
+						<Typography sx={{ fontWeight: "500" }}>
+							Finalizando la impresión
+						</Typography>
+					)}
+				</Box>
 			</Box>
 			<MotiveModal
 				title={"Escriba el motivo de reemplazo de Ticket Muleto"}
@@ -378,7 +344,7 @@ const VerifiedTicketPaper = ({ formatShortMonth, parseDate }) => {
 				onClick={handlePrint}
 				exitText={"Cancelar"}
 				confirmText={"Confirmar"}
-				// condition={motive.length > 20}
+				condition={motive.length > 20}
 			/>
 		</>
 	);

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
 import { useNavigate } from "react-router";
 import { TicketDataCOntext } from "../context/TicketData";
-import { ApiContext } from "../context/ApiContext";
+import { ApiContext } from "@oc/api-context";
 
 const DialogConfirm = ({ setOpen, open, ticketData, setCount }) => {
 	const { setTicket } = useContext(TicketDataCOntext);

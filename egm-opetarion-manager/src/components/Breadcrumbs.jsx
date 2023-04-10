@@ -11,14 +11,11 @@ const Breadcrumbs = () => {
 			{matches.map((element) => (
 				<>
 					{element.pathname === url ? (
-						<Typography sx={{ color: "white", fontWeight: "bold" }}>
+						<Typography sx={{ color: "white" }}>
 							{element.handle?.breadCrumsCaption}
 						</Typography>
 					) : (
-						<Link
-							to={element.pathname}
-							style={{ color: "white", fontWeight: "bold" }}
-						>
+						<Link to={element.pathname} style={{ color: "white" }}>
 							{element.handle?.breadCrumsCaption}
 						</Link>
 					)}

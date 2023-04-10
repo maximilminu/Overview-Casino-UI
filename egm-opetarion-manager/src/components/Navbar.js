@@ -16,14 +16,14 @@ import {
 	Zoom,
 } from "@mui/material";
 
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PrinterButton from "../components/PrinterButton";
 import packageJson from "../../package.json";
-import { ConfigContext } from "../context/ConfigProvider";
-import { useNavigate } from "react-router-dom";
+import { ConfigContext } from "@oc/config-context";
+
 import Avatar from "./Avatar";
-import { ApiContext } from "../context/ApiContext";
-import { UserContext } from "../context/UserProvider";
+import { ApiContext } from "@oc/api-context";
+import { UserContext } from "@oc/user-context";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -45,8 +45,7 @@ const Navbar = () => {
 	const down600px = useMediaQuery(theme.breakpoints.down("sm"));
 	const [anchorEl, setAnchorEl] = useState(null);
 	const open = Boolean(anchorEl);
-	const { param } = useParams();
-	const navigate = useNavigate();
+
 	const [anchorElUser, setAnchorElUser] = useState(null);
 	const userProfile = useContext(UserContext);
 	const { Logout } = useContext(ApiContext);
@@ -62,14 +61,6 @@ const Navbar = () => {
 	const handleLogout = () => {
 		handleCloseUserMenu();
 		Logout();
-	};
-
-	const onSearch = (user) => {
-		navigate(`/egm-operation-manager/member-list/${user}`);
-	};
-
-	const onEmpty = (to) => {
-		navigate("/egm-operation-manager");
 	};
 
 	return (
@@ -113,7 +104,11 @@ const Navbar = () => {
 							<Box
 								component="img"
 								src={config.Images.LogoHeader}
-								sx={{ width: down600px ? "100px" : "130px", height: "60px" }}
+								sx={{
+									objectFit: "contain",
+									width: down600px ? "90px" : "160px",
+									height: down600px ? "40px" : "46px",
+								}}
 							/>
 						</Link>
 					</Tooltip>

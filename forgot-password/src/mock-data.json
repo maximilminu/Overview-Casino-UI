@@ -1,0 +1,112 @@
+[
+	{
+		"id": 1,
+		"firstName": "Jonatan",
+		"lastName": "Schijman",
+		"email": "jschijman@tecnoazar.com.ar",
+		"legajo": "5467771",
+		"DNI": "12345678",
+		"role": "Desarrollador de Software",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 2,
+		"firstName": "Pandora",
+		"lastName": "Degg",
+		"email": "pandora_degg@tecnoazar.com.ar",
+		"legajo": "5469991",
+		"DNI": "123",
+		"role": "Cajera",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 3,
+		"firstName": "Erica",
+		"lastName": "Matthai",
+		"email": "ematthai@tecnoazar.com.ar",
+		"legajo": "5469991",
+		"DNI": "32598744",
+		"role": "Cajera",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 4,
+		"firstName": "Lorena",
+		"lastName": "Suarez",
+		"email": "loresuarez_@tecnoazar.com.ar",
+		"legajo": "30469991",
+		"DNI": "12345",
+		"role": "Desarrollador de Software",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 5,
+		"firstName": "Lara",
+		"lastName": "Perschke",
+		"email": "laraperschke@tecnoazar.com.ar",
+		"legajo": "5469991",
+		"DNI": "123456",
+		"role": "Desarrollador de Software",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 6,
+		"firstName": "Ramona",
+		"lastName": "Mitton",
+		"email": "rmitton@tecnoazar.com.ar",
+		"legajo": "5469991",
+		"DNI": "654321",
+		"role": "Desarrollador de Software",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 7,
+		"firstName": "Lorenzo",
+		"lastName": "Castello",
+		"email": "lcastello@tecnoazar.com.ar",
+		"legajo": "5469991",
+		"DNI": "54321",
+		"role": "Cajero",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 8,
+		"firstName": "Juan",
+		"lastName": "Gómez",
+		"email": "juangomez@tecnoazar.com.ar",
+		"legajo": "5469991",
+		"DNI": "4321",
+		"role": "Seguridad",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 9,
+		"firstName": "Micalea",
+		"lastName": "Rodríguez",
+		"legajo": "5469991",
+		"email": "mrodriguez@tecnoazar.com.ar",
+		"DNI": "321",
+		"role": "Seguridad",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 10,
+		"firstName": "Rudyard",
+		"lastName": "Luxon",
+		"legajo": "5469991",
+		"email": "rluxon@tecnoazar.com.ar",
+		"DNI": "213",
+		"role": "Seguridad",
+		"contactNumber": "1132860515"
+	},
+	{
+		"id": 11,
+		"firstName": "Alexis",
+		"lastName": "Redes",
+		"legajo": "5469991",
+		"email": "alexis@tecnoazar.com.ar",
+		"DNI": "43256520",
+		"role": "Seguridad",
+		"contactNumber": "1132860515"
+	}
+]

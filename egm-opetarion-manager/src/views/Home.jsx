@@ -1,9 +1,8 @@
 import { Box } from "@mui/material";
 import React from "react";
-import { Outlet, Route, Routes, useMatches } from "react-router";
+import { Outlet, useMatches } from "react-router";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import AutoDeepLinkProvider from "../context/AutoDeepLinkContext";
 
 const Home = () => {
 	const matches = useMatches();
@@ -11,7 +10,7 @@ const Home = () => {
 		<>
 			<Navbar />
 			<Box
-				container
+				container="true"
 				sx={{
 					position: "fixed",
 					top: "65px",
@@ -23,7 +22,6 @@ const Home = () => {
 				}}
 			>
 				{" "}
-				<AutoDeepLinkProvider />
 				<Outlet />
 			</Box>
 			<Footer />

@@ -1,38 +1,44 @@
 import { Container } from "@mui/system";
-import React from "react";
+import React, { useContext } from "react";
 import TicketUI from "../components/TicketUI";
 import PrintTicket from "../components/PrintTicket";
+import { TicketDataCOntext } from "../context/TicketData";
 
+const style = {
+	container: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		flexDirection: "column",
+	},
+
+	paper: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		flexDirection: "column",
+		height: "250px",
+		width: "400px",
+		margin: "2rem",
+		elevation: "2",
+		padding: "40px",
+		backgroundColor: "third.main",
+		color: "primary.main",
+	},
+	confirmBox: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		flexDirection: "column",
+		minHeight: "0vh",
+	},
+};
 const TicketFound = () => {
-	const style = {
-		container: {
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "center",
-			flexDirection: "column",
-		},
-
-		paper: {
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "center",
-			flexDirection: "column",
-			height: "250px",
-			width: "400px",
-			margin: "2rem",
-			elevation: "2",
-			padding: "40px",
-			backgroundColor: "third.main",
-			color: "primary.main",
-		},
-		confirmBox: {
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "center",
-			flexDirection: "column",
-			minHeight: "0vh",
-		},
-	};
+	const { ticket } = useContext(TicketDataCOntext);
+	const value = +ticket?.Amount;
+	const parsedValue = value?.toLocaleString("es-AR", {
+		minimumFractionDigits: 2,
+	});
 
 	const formatShortMonth = (data) => {
 		let date = new Date(data);
@@ -58,10 +64,21 @@ const TicketFound = () => {
 		return day + "/" + month + "/" + year + " " + time;
 	};
 
+	const formatMonth = formatShortMonth(ticket?.PrintedAt);
+	const BarcodeValue = ticket?.Barcode;
+
+	const parsedDate = parseDate(formatMonth);
+	const machineID = ticket?.PrintedIn;
+
 	return (
 		<>
 			<Container sx={style.container}>
-				<TicketUI formatShortMonth={formatShortMonth} parseDate={parseDate} />
+				<TicketUI
+					BarcodeValue={BarcodeValue}
+					parsedDate={parsedDate}
+					parsedValue={parsedValue}
+					machineID={machineID}
+				/>
 				<PrintTicket
 					formatShortMonth={formatShortMonth}
 					parseDate={parseDate}
