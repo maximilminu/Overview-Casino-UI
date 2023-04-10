@@ -31,7 +31,7 @@ const ErrorAlert = ({ message }) => {
               <CloseIcon fontSize="inherit" />
             </IconButton>
           }
-          sx={{ margin: "0 auto", width: "13.30vw" }}
+          sx={{ margin: "0 auto", width: "100%" }}
           severity="error"
         >
           <AlertTitle>

@@ -11,7 +11,6 @@ import React from "react";
 import { useContext } from "react";
 import { ConfigContext } from "../context/ConfigProvider";
 import packageJson from "../../package.json";
-import { Link } from "react-router-dom";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -37,9 +36,10 @@ const LogoLeft = () => {
     marginInline: !matches && "auto",
     top: matches && 0,
     left: matches && "50px",
-    width: "200px",
+    width: { xl: "200px", lg: "200px", md: "200px", sm: "200px", xs: "150px" },
     height: "115px",
     objectFit: "contain",
+    marginLeft: { xs: "25px" },
   };
 
   return (
@@ -50,14 +50,12 @@ const LogoLeft = () => {
           TransitionComponent={Zoom}
           title={`v${packageJson.version}`}
         >
-          <Link to="/front-desk">
-            <Box
-              component="img"
-              alt="logo tecnoazar"
-              sx={LogoBoxStyle}
-              src={config.LogoLeft}
-            />
-          </Link>
+          <Box
+            component="img"
+            alt="logo tecnoazar"
+            sx={LogoBoxStyle}
+            src={config.LogoLeft}
+          />
         </HtmlTooltip>
       ) : (
         <Tooltip
@@ -65,14 +63,12 @@ const LogoLeft = () => {
           TransitionComponent={Zoom}
           title={`v${packageJson.version}`}
         >
-          <Link to="/front-desk">
-            <Box
-              component="img"
-              alt="logo tecnoazar"
-              sx={LogoBoxStyle}
-              src={config.LogoLeft}
-            />
-          </Link>
+          <Box
+            component="img"
+            alt="logo tecnoazar"
+            sx={LogoBoxStyle}
+            src={config.LogoLeft}
+          />
         </Tooltip>
       )}
     </>

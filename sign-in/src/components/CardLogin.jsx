@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import ImageCrupier from "./ImageCrupier";
 import Form from "./Form";
-import "../index.css";
 
 const CardLogin2 = () => {
   const theme = useTheme();
@@ -16,16 +15,22 @@ const CardLogin2 = () => {
 
   const style = {
     box: {
-      marginTop: {
+      // marginTop: {
+      //   xl: "50px",
+      //   lg: "50px",
+      //   md: "50px",
+      //   sm: "100px",
+      //   xs: "50px",
+      // },
+      borderRadius: "3%",
+      width: { xl: "40%", lg: "40%", md: "40%", sm: "70%", xs: "95%" },
+      marginBottom: {
         xl: "50px",
         lg: "50px",
         md: "50px",
-        sm: "100px",
+        sm: "50px",
         xs: "50px",
       },
-      borderRadius: "3%",
-      width: { xl: "40%", lg: "40%", md: "40%", sm: "70%", xs: "100%" },
-      marginBottom: { xl: "50px", lg: "50px", md: "50px" },
       height: "35%",
       padding: "50px",
       background: "linear-gradient(195deg, rgb(66, 66, 74), rgb(25, 25, 25))",
@@ -62,9 +67,9 @@ const CardLogin2 = () => {
               sx={{
                 color: "third.main",
                 fontSize: {
-                  xs: "29px",
-                  sm: "36px",
-                  md: "37px",
+                  xs: "27px",
+                  sm: "32px",
+                  md: "32px",
                   lg: "36px",
                   xl: "41px",
                 },

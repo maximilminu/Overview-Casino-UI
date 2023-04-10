@@ -1,0 +1,78 @@
+{
+	"name": "secure-browser-setup",
+	"homepage": "secure-browser-setup",
+	"version": "1.0.0-rc",
+	"private": true,
+	"dependencies": {
+		"@emotion/react": "^11.10.5",
+		"@emotion/styled": "^11.10.5",
+		"@mui/icons-material": "^5.10.9",
+		"@mui/joy": "^5.0.0-alpha.58",
+		"@mui/material": "^5.11.1",
+		"@oc/barcode-reader-context": "^1.0.1",
+		"@oc/camera-context": "^1.0.2",
+		"@oc/escpos-printer-context": "^1.0.1",
+		"@oc/notify-user-context": "^1.0.1",
+		"@oc/rfld-reader-context": "^1.0.1",
+		"@oc/secure-browser-context": "^1.0.1",
+		"@oc/tcl-printer-context": "^1.0.1",
+		"@testing-library/jest-dom": "^5.16.5",
+		"@testing-library/react": "^13.4.0",
+		"@testing-library/user-event": "^13.5.0",
+		"assert": "^2.0.0",
+		"axios": "^1.2.1",
+		"browserify-zlib": "^0.2.0",
+		"buffer": "^6.0.3",
+		"dayjs": "^1.11.7",
+		"escpos": "^3.0.0-alpha.6",
+		"fast-json-patch": "^3.1.1",
+		"http-browserify": "^1.7.0",
+		"https-browserify": "^1.0.0",
+		"notistack": "^2.0.8",
+		"os-browserify": "^0.3.0",
+		"path-browserify": "^1.0.1",
+		"process": "^0.11.10",
+		"qrcode": "^1.5.1",
+		"react": "^18.2.0",
+		"react-cookie": "^4.1.1",
+		"react-dom": "^18.2.0",
+		"react-hook-form": "^7.39.4",
+		"react-idle-timer": "^5.4.2",
+		"react-router-dom": "^6.4.3",
+		"react-router-hash-link": "^2.4.3",
+		"react-scripts": "5.0.1",
+		"react-use-localstorage": "^3.5.3",
+		"react-webcam": "^7.0.1",
+		"stream-browserify": "^3.0.0",
+		"stream-http": "^3.2.0",
+		"url": "^0.11.0",
+		"util": "^0.12.5"
+	},
+	"scripts": {
+		"start": "react-app-rewired start",
+		"build": "react-app-rewired build",
+		"test": "react-app-rewired test",
+		"eject": "react-app-rewired eject"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"react-app-rewired": "^2.2.1"
+	}
+}

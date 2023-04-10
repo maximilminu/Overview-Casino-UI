@@ -1,0 +1,79 @@
+body {
+  margin: 0;
+  background-color: black;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ebebeb;
+  background-size: 300% 300%;
+  animation: gradient 5s alternate infinite;
+  height: 100%;
+
+  width: 100%;
+}
+
+.home-paper {
+  background: linear-gradient(90deg, #019f98, #3c3c43, #d03c31);
+  background-size: 300% 300%;
+  animation: gradient 5s alternate infinite;
+  height: 100%;
+  width: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.input:-internal-autofill-selected {
+  background-color: red;
+}
+
+.user-details-box {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 50%;
+  height: 25%;
+  background: linear-gradient(90deg, #019f98, #3c3c43, #d03c31);
+  background-size: 300% 300%;
+  animation: gradient 5s alternate infinite;
+  z-index: 0;
+  transform: skewY(-3deg);
+  transform-origin: top left;
+  margin: 0 auto;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 100%;
+  }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.input:-internal-autofill-selected {
+  background-color: red;
+}
+
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}

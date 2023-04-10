@@ -14,7 +14,7 @@ const LogoRight = () => {
     marginInline: !matches && "auto",
     top: matches && 0,
     right: matches && "50px",
-    width: "200px",
+    width: { xl: "200px", lg: "200px", md: "200px", sm: "200px", xs: "150px" },
     height: "115px",
     objectFit: "contain",
   };

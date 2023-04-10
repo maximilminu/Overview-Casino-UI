@@ -5,7 +5,6 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 const ErrorModal = ({ message }) => {
-
   const style = {
     position: "absolute",
     top: "50%",
