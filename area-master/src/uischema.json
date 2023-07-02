@@ -1,0 +1,58 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Control",
+      "label": "Avatar",
+      "scope": "#/properties/Avatar"
+    },
+    {
+      "type": "Control",
+      "label": "Área Padre",
+      "scope": "#/properties/Parent",
+      "options": {
+        "autocomplete" : true
+      }
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+      
+        {
+          "type": "Control",
+          "label": "",
+          "scope": "#/properties/Name",
+          "otherLabel": "Nombre",
+          "alphanumeric":"alphanumeric"
+        }
+      ]
+    },
+    {
+      "type": "HorizontalLayout",
+      "elements": [
+      
+       
+        {
+          "type": "Control",
+          "scope": "#/properties/Address/properties/Line1",
+          "label": "",
+          "otherLabel": "Dirección",
+          "direction": "direction"
+        }
+      ]
+    },
+
+    
+    {
+      "type": "VerticalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "label": "Medios de Contacto",
+          "scope": "#/properties/ContactMethods"
+        }
+      ]
+    }
+    
+  ]
+}

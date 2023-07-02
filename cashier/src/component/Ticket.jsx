@@ -1,7 +1,8 @@
 import { Grid, Paper, Typography } from "@mui/material";
 import Barcode from "react-barcode";
 
-const Ticket = ({ data }) => {
+const Ticket = (props) => {
+  console.log(props)
   return (
     <Paper
       elevation={3}
@@ -29,10 +30,10 @@ const Ticket = ({ data }) => {
           <Typography>Av. Patricio Peralta Ramos 2100 Mar del Plata</Typography>
         </Grid>
         <Grid item>
-          <Typography variant="h2">TICKET YA PAGADO</Typography>
+          <Typography variant={props.thereArePayedTickets ? "h2" : "h4"}>{props.thereArePayedTickets ? "TICKET YA PAGADO" : "TICKET NO DISPONIBLE PARA PAGO"}</Typography>
         </Grid>
         <Grid item>
-          <Barcode value={data.Barcode} />
+          <Barcode value={props.payedTicket.Barcode || props.notPayableTicket.Barcode} />
         </Grid>
         <Grid
           container
@@ -41,11 +42,11 @@ const Ticket = ({ data }) => {
           alignItems="center"
         >
           <Grid item>
-            <Typography>{new Date(data.PrintedAt).toLocaleString()}</Typography>
+            <Typography>{new Date(props.payedTicket.PrintedAt || props.notPayableTicket.PrintedAt ).toLocaleString()}</Typography>
           </Grid>
         </Grid>
         <Grid item>
-          <Typography variant="h3">{data.Amount} ARS</Typography>
+          <Typography variant="h3">{props.payedTicket.Amount || props.notPayableTicket.Amount} ARS</Typography>
         </Grid>
         <Grid
           container
@@ -58,11 +59,33 @@ const Ticket = ({ data }) => {
             <Typography>VALIDO POR 30 DÍAS</Typography>
           </Grid>
           <Grid item>
-            <Typography>MAQUÍNA NRO {data.PrintedIn}</Typography>
+            <Typography>MAQUÍNA NRO {props.payedTicket.PrintedIn || props.notPayableTicket.PrintedIn}</Typography>
           </Grid>
         </Grid>
       </Grid>
+      <Grid item sx={{display:"flex", justifyContent:"center", alignItems:"center", backgroundColor:"red", marginTop:"30px",borderRadius: "5px", }}>
+
       <Typography
+        sx={{
+         
+          textAlign: "center",
+        
+          color: "white",
+          
+        }}
+      >
+        {props.thereArePayedTickets && "Pagado por Jonatán Schijman"}
+        {props.thereIsNotPayableTicket &&  "Este ticket no puede ser pagado"}
+        {props.thereArePayedTickets && ` el ${new Date(props.payedTicket.RedeemedAt || props.notPayableTicket.RedeemedAt).toLocaleString()}`}
+      </Typography>
+      </Grid>
+  
+    </Paper>
+  );
+};
+
+
+/*    <Typography
         sx={{
           background: "red",
           padding: "5px",
@@ -74,14 +97,8 @@ const Ticket = ({ data }) => {
           left: "33%",
         }}
       >
-        PAGADO por
-        <br />
-        {(data.RedeemedBy || {}).FullName}
-        <br />
-        el {new Date(data.RedeemedAt).toLocaleString()}
-      </Typography>
-    </Paper>
-  );
-};
-
+        {props.notPayableTicket ? "Este ticket no puede ser pagado" : "Pagado por Jonatán Schijman"}
+       
+        {props.payedTicket && `el ${new Date(props.payedTicket.RedeemedAt || props.notPayableTicket.RedeemedAt).toLocaleString()}`}
+      </Typography> */ 
 export default Ticket;

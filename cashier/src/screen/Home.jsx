@@ -3,15 +3,29 @@ import Navbar from "../component/Navbar";
 import Footer from "../component/Footer";
 import { useRef } from "react";
 import { Box } from "@mui/system";
-import AutoDeepLinkProvider from "../context/AutoDeepLinkContext";
 import { useState } from "react";
+import { useLayoutEffect } from "react";
+import { HardwareContext } from "@oc/hardware-context";
+import { useContext } from "react";
 
 function Home() {
+  const Hardware = useContext(HardwareContext);
   const buttonsRef = useRef([]);
   const matches = useMatches();
   const [headerHeight, setHeaderHeight] = useState(0);
   const [footerHeight, setFooterHeight] = useState(0);
   const [disable, setDisable] = useState();
+
+  useLayoutEffect(() => {
+    Hardware.ConnectAll()
+      .then((ret) => {
+        console.log("Devices initialized:", ret);
+      })
+      .catch((err) => {
+        console.log("Problems connecting devices:", err);
+      });
+  }, [Hardware]);
+
   return (
     <>
       <Navbar onHeightChange={setHeaderHeight} buttonsRef={buttonsRef} />
@@ -27,7 +41,6 @@ function Home() {
           backgroundColor: matches.length > 1 && "#eeeeeeb0",
         }}
       >
-        <AutoDeepLinkProvider />
         <Outlet context={[disable, setDisable]} />
       </Box>
       <Footer disable={disable} onHeightChange={setFooterHeight} />

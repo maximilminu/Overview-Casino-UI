@@ -1,6 +1,5 @@
 import { createElement } from "react";
 import { useLocation } from "react-router-dom";
-import Home from "./Home";
 import Pay from "./Pay";
 
 const screens = {

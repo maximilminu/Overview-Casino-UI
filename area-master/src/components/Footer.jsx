@@ -11,7 +11,7 @@ import {
   styled,
 } from "@mui/material";
 import packageJson from "../../package.json";
-import { ConfigContext } from "../context/ConfigProvider";
+import { ConfigContext } from "@oc/config-context";
 import { useNavigate } from "react-router-dom";
 import Breadcrumbs from "./Breadcrumbs";
 

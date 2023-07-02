@@ -1880,78 +1880,44 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@oc/api-context@^1.0.12", "@oc/api-context@^1.0.15", "@oc/api-context@^1.0.5":
-  version "1.0.15"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/api-context/-/@oc/api-context-1.0.15.tgz#80fcc330bc7370709d82aa246b05b0574f3e9cba"
-  integrity sha1-gPzDMLxzcHCdgqokawWwV08+nLo=
+"@oc/api-context@^1.0.17":
+  version "1.0.17"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/api-context/-/@oc/api-context-1.0.17.tgz#6a6bddb5fa2b7819e282e475ac5c6014c2eebfc3"
+  integrity sha1-amvdtforeBniguR1rFxgFMLuv8M=
   dependencies:
-    "@oc/notify-user-context" "^1.0.2"
+    "@oc/notify-user-context" "^1.0.3"
     axios "^1.2.3"
     react "^18.2.0"
     react-cookie "^4.1.1"
     react-use-localstorage "^3.5.3"
 
-"@oc/auto-deeplink-context@^1.0.4":
-  version "1.0.4"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/auto-deeplink-context/-/@oc/auto-deeplink-context-1.0.4.tgz#2a1eb9f21f46456be0af6de91c895fb96e5fa23d"
-  integrity sha1-Kh658h9GRWvgr23pHIlfuW5foj0=
+"@oc/config-context@^1.0.11", "@oc/config-context@^1.0.12":
+  version "1.0.13"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/config-context/-/@oc/config-context-1.0.13.tgz#d178e5f292c90e1aba49e261f72c8d798acf02d4"
+  integrity sha1-0Xjl8pLJDhq6SeJh9yyNeYrPAtQ=
   dependencies:
-    "@oc/api-context" "^1.0.5"
-    react "^18.2.0"
-    react-router-dom "^6.7.0"
-
-"@oc/barcode-reader-context@^1.0.1":
-  version "1.0.2"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/barcode-reader-context/-/@oc/barcode-reader-context-1.0.2.tgz#a31bfba1207b87602679fa8a0cd3f508afb0acaa"
-  integrity sha1-oxv7oSB7h2AmefqKDNP1CK+wrKo=
-  dependencies:
+    "@oc/api-context" "^1.0.17"
     react "^18.2.0"
 
-"@oc/camera-context@^1.0.2":
-  version "1.0.3"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/camera-context/-/@oc/camera-context-1.0.3.tgz#0e7bdb9e87e23d09abb0c1e813fc2acb28f0c3c3"
-  integrity sha1-DnvbnofiPQmrsMHoE/wqyyjww8M=
-  dependencies:
-    react "^18.2.0"
-    react-use-localstorage "^3.5.3"
-
-"@oc/config-context@^1.0.10", "@oc/config-context@^1.0.7":
+"@oc/hardware-context@^1.0.10":
   version "1.0.10"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/config-context/-/@oc/config-context-1.0.10.tgz#7ddc38ce2774dc2ba5e1cdc6370976fbf3e89fdf"
-  integrity sha1-fdw4zid03Cul4c3GNwl2+/Pon98=
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/hardware-context/-/@oc/hardware-context-1.0.10.tgz#6cffd1c700f58471a199ff693b382800891e672d"
+  integrity sha1-bP/RxwD1hHGhmf9pOzgoAIkeZy0=
   dependencies:
-    "@oc/api-context" "^1.0.15"
-    react "^18.2.0"
-
-"@oc/escpos-printer-context@^1.0.4":
-  version "1.0.8"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/escpos-printer-context/-/@oc/escpos-printer-context-1.0.8.tgz#0c7021662f5ffd5a0b1b91cf2f9ea9b0bfdf0c52"
-  integrity sha1-DHAhZi9f/VoLG5HPL56psL/fDFI=
-  dependencies:
-    browserify-zlib "^0.2.0"
-    buffer "^6.0.3"
     escpos "^3.0.0-alpha.6"
-    http-browserify "^1.7.0"
-    https-browserify "^1.0.0"
     jsbarcode "^3.11.5"
-    os-browserify "^0.3.0"
-    path-browserify "^1.0.1"
+    ndarray "^1.0.19"
     qrcode "^1.5.1"
-    react "^18.2.0"
-    stream-browserify "^3.0.0"
-    stream-http "^3.2.0"
-    url "^0.11.0"
-    util "^0.12.5"
 
 "@oc/local-format-util@^1.0.1":
   version "1.0.1"
   resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/local-format-util/-/@oc/local-format-util-1.0.1.tgz#9e5cd84dd2bb8272fe6a2562222f2eb1964e0e44"
   integrity sha1-nlzYTdK7gnL+aiViIi8usZZODkQ=
 
-"@oc/notify-user-context@^1.0.1", "@oc/notify-user-context@^1.0.2":
-  version "1.0.2"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/notify-user-context/-/@oc/notify-user-context-1.0.2.tgz#079c0a31f2a835658d5cf04940039cbad3365f72"
-  integrity sha1-B5wKMfKoNWWNXPBJQAOcutM2X3I=
+"@oc/notify-user-context@^1.0.3", "@oc/notify-user-context@^1.0.5":
+  version "1.0.5"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/notify-user-context/-/@oc/notify-user-context-1.0.5.tgz#4550c5a4168700f1f481ca5358868122dc2152c9"
+  integrity sha1-RVDFpBaHAPH0gcpTWIaBItwhUsk=
   dependencies:
     notistack "^2.0.8"
     react "^18.2.0"
@@ -1963,30 +1929,22 @@
   dependencies:
     "@oc/local-format-util" "^1.0.1"
 
-"@oc/tcl-printer-context@^1.0.1":
-  version "1.0.3"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/tcl-printer-context/-/@oc/tcl-printer-context-1.0.3.tgz#5cdf1700ea500f7e47204678b16874d910285d70"
-  integrity sha1-XN8XAOpQD35HIEZ4sWh02RAoXXA=
-  dependencies:
-    dayjs "^1.11.7"
-    react "^18.2.0"
-
-"@oc/theme-context@^1.0.7":
-  version "1.0.13"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/theme-context/-/@oc/theme-context-1.0.13.tgz#a444d8a2bfbd2ab2476877f94378c83f6012b8f3"
-  integrity sha1-pETYor+9KrJHaHf5Q3jIP2ASuPM=
+"@oc/theme-context@^1.0.13":
+  version "1.0.15"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/theme-context/-/@oc/theme-context-1.0.15.tgz#dad2e638b8b7ee33976314005f0b7e65a26ef17d"
+  integrity sha1-2tLmOLi37jOXYxQAXwt+ZaJu8X0=
   dependencies:
     "@mui/material" "^5.11.11"
     "@mui/system" "^5.11.11"
-    "@oc/config-context" "^1.0.10"
+    "@oc/config-context" "^1.0.12"
     react "^18.2.0"
 
-"@oc/user-context@^1.0.7":
-  version "1.0.7"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/user-context/-/@oc/user-context-1.0.7.tgz#7c877aedc6d665250dbeb98c61c98b0ed30052ba"
-  integrity sha1-fId67cbWZSUNvrmMYcmLDtMAUro=
+"@oc/user-context@^1.0.8":
+  version "1.0.9"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/user-context/-/@oc/user-context-1.0.9.tgz#4191ef9b62520f96b086e8c1e80d78a25bc8df54"
+  integrity sha1-QZHvm2JSD5awhujB6A14olvI31Q=
   dependencies:
-    "@oc/api-context" "^1.0.15"
+    "@oc/api-context" "^1.0.17"
     jwt-decode "^3.1.2"
     react "^18.2.0"
 
@@ -4084,7 +4042,7 @@ dayjs@1.10.6:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.6.tgz#288b2aa82f2d8418a6c9d4df5898c0737ad02a63"
   integrity sha512-AztC/IOW4L1Q41A86phW5Thhcrco3xuAA+YX/BLpLWWjRcTj5TOt/QImBLmCKlrF7u7k47arTnOyL6GnbG8Hvw==
 
-dayjs@^1.11.5, dayjs@^1.11.7:
+dayjs@^1.11.5:
   version "1.11.7"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.7.tgz#4b296922642f70999544d1144a2c25730fce63e2"
   integrity sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==
@@ -5005,6 +4963,11 @@ fast-glob@^3.2.12, fast-glob@^3.2.9:
     glob-parent "^5.1.2"
     merge2 "^1.3.0"
     micromatch "^4.0.4"
+
+fast-json-patch@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/fast-json-patch/-/fast-json-patch-3.1.1.tgz#85064ea1b1ebf97a3f7ad01e23f9337e72c66947"
+  integrity sha512-vf6IHUX2SBcA+5/+4883dsIjpBTqmfBjmYiWK1savxQmFk4JfBMLa7ynTYOs1Rolp/T1betJxHiGD3g1Mn8lUQ==
 
 fast-json-stable-stringify@^2.0.0, fast-json-stable-stringify@^2.1.0:
   version "2.1.0"
@@ -7177,7 +7140,7 @@ ndarray-pack@^1.1.1:
     cwise-compiler "^1.1.2"
     ndarray "^1.0.13"
 
-ndarray@^1.0.13:
+ndarray@^1.0.13, ndarray@^1.0.19:
   version "1.0.19"
   resolved "https://registry.yarnpkg.com/ndarray/-/ndarray-1.0.19.tgz#6785b5f5dfa58b83e31ae5b2a058cfd1ab3f694e"
   integrity sha512-B4JHA4vdyZU30ELBw3g7/p9bZupyew5a7tX1Y/gGeF2hafrPaQZhgrGQfsvgfYbgdFZjYwuEcnaobeM/WMW+HQ==
@@ -8484,7 +8447,7 @@ react-refresh@^0.11.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
   integrity sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==
 
-react-router-dom@^6.4.4, react-router-dom@^6.7.0:
+react-router-dom@^6.4.4:
   version "6.8.2"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.8.2.tgz#a6654a3400be9aafd504d7125573568921b78b57"
   integrity sha512-N/oAF1Shd7g4tWy+75IIufCGsHBqT74tnzHQhbiUTYILYF0Blk65cg+HPZqwC+6SqEyx033nKqU7by38v3lBZg==
@@ -9867,7 +9830,7 @@ util.promisify@~1.0.0:
     has-symbols "^1.0.1"
     object.getownpropertydescriptors "^2.1.0"
 
-util@^0.12.0, util@^0.12.4, util@^0.12.5:
+util@^0.12.0, util@^0.12.4:
   version "0.12.5"
   resolved "https://registry.yarnpkg.com/util/-/util-0.12.5.tgz#5f17a6059b73db61a875668781a1c2b136bd6fbc"
   integrity sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==

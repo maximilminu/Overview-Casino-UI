@@ -1951,10 +1951,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@oc/api-context@^1.0.11", "@oc/api-context@^1.0.15":
-  version "1.0.15"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/api-context/-/@oc/api-context-1.0.15.tgz#80fcc330bc7370709d82aa246b05b0574f3e9cba"
-  integrity sha1-gPzDMLxzcHCdgqokawWwV08+nLo=
+"@oc/hardware-context@^1.0.14":
+  version "1.0.14"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/hardware-context/-/@oc/hardware-context-1.0.14.tgz#1f7bfd99534005c8e653027445bd917b4d2fbbdd"
+  integrity sha1-H3v9mVNABcjmUwJ0Rb2Re00vu90=
   dependencies:
     "@oc/notify-user-context" "^1.0.2"
     axios "^1.2.3"
@@ -6609,7 +6609,7 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-jsbarcode@^3.11.5, jsbarcode@^3.8.0:
+jsbarcode@^3.8.0:
   version "3.11.5"
   resolved "https://registry.yarnpkg.com/jsbarcode/-/jsbarcode-3.11.5.tgz#390b3efd0271f35b9d68c7b8af6e972445969014"
   integrity sha512-zv3KsH51zD00I/LrFzFSM6dst7rDn0vIMzaiZFL7qusTjPZiPtxg3zxetp0RR7obmjTw4f6NyGgbdkBCgZUIrA==
@@ -7087,7 +7087,7 @@ ndarray-pack@^1.1.1:
     cwise-compiler "^1.1.2"
     ndarray "^1.0.13"
 
-ndarray@^1.0.13:
+ndarray@^1.0.13, ndarray@^1.0.19:
   version "1.0.19"
   resolved "https://registry.yarnpkg.com/ndarray/-/ndarray-1.0.19.tgz#6785b5f5dfa58b83e31ae5b2a058cfd1ab3f694e"
   integrity sha512-B4JHA4vdyZU30ELBw3g7/p9bZupyew5a7tX1Y/gGeF2hafrPaQZhgrGQfsvgfYbgdFZjYwuEcnaobeM/WMW+HQ==

@@ -67,7 +67,6 @@ export const printSignature = (printer, name, title) => {
 };
 
 export const printFailureBySupervisor = (printer, data) => {
-  console.log(data, "data");
   if (data.OverToleranceBySupervisor) {
     printer
       .feed(1)
@@ -108,7 +107,6 @@ export const printDescValue = (
   width = 48,
   sign = false
 ) => {
-  console.log(value, "value");
   let val;
   if (!sign) {
     val =
@@ -129,7 +127,6 @@ export const printDescValue = (
 
 export const print = (data, qr, url) => (printer) =>
   new Promise((resolve) => {
-    console.log(data);
     printFailure(printer, data);
 
     printTitle(printer, [
@@ -189,13 +186,12 @@ export const print = (data, qr, url) => (printer) =>
     printDescValue(printer, "Entradas", data.TotalIn);
     printDescValue(printer, "Salidas", -data.TotalOut);
     printDescValue(printer, "En caja", -data.TotalBills);
-
     printTitle(printer, "BALANCE");
-    if (data?.FailedBalance?.BalanceBySupervisor) {
+    if (data?.BalanceBySupervisor) {
       printDescValue(
         printer,
         "SUPERVISOR",
-        data.FailedBalance.BalanceBySupervisor,
+        data.BalanceBySupervisor,
         "b",
         24,
         true
@@ -210,12 +206,12 @@ export const print = (data, qr, url) => (printer) =>
 
     printer.size(0, 0).raster(qr).align("ct").text(url);
 
-    printSignature(printer, data.RegisteredBy.FullName, "Cajero");
+    printSignature(printer, "Jonatán Schijman", "Cajero");
     if (data.Authorizing) {
       printSignature(printer, data.Authorizing.FullName, data.Authorizing.Role);
     }
 
-    data?.FailedBalance?.BalanceBySupervisor
+    data?.BalanceBySupervisor
       ? printFailureBySupervisor(printer, data)
       : printFailure(printer, data);
 

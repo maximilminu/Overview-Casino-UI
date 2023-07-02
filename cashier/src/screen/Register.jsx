@@ -1,5 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import {
+  Alert,
   Button,
   Dialog,
   DialogTitle,
@@ -14,18 +15,17 @@ import { useContext, useLayoutEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
 import { ApiContext } from "@oc/api-context";
 import { FormatLocalCurrency } from "../utils/Intl";
-import { EscPosPrinterContext } from "@oc/escpos-printer-context";
+
 import { print } from "../utils/PrintUtils";
 import { NotifyUserContext } from "@oc/notify-user-context";
 import { Link, useOutletContext } from "react-router-dom";
 import InformationAccordion from "../component/InformationAccordion";
 import DialogLogInSupervisor from "../component/DialogLogInSupervisor";
-import ConfirmDialog from "../component/ConfirmDialog";
-import Tokens from "../component/Tokens";
+import { HardwareContext } from "@oc/hardware-context";
 
 const Register = (props) => {
   const theme = useTheme();
-  const { Printer } = useContext(EscPosPrinterContext);
+  const Hardware = useContext(HardwareContext);
   const NotifyUser = useContext(NotifyUserContext);
   const { Get, Post, logInSupervisor } = useContext(ApiContext);
   const [denominations, setDenominations] = useState([]);
@@ -38,7 +38,7 @@ const Register = (props) => {
   const [supervisionModal, setSupervisionModal] = useState(false);
   const [balance, setBalance] = useState(0);
   const [showConfirmTicketDialog, setShowConfirmTicketDialog] = useState(false);
-  const [balanceMadeBySupervisor, setBalanceMadeBySupervisor] = useState(0);
+  const [balanceMadeBySupervisor, setBalanceMadeBySupervisor] = useState(false);
   const [totalBills, setTotalBills] = useState(0);
   const [showConfirmButton, setShowConfirmButton] = useState(true);
   const [showSupervisionAccordion, setShowSupervisionAccordion] =
@@ -56,6 +56,7 @@ const Register = (props) => {
   const [showFinishOperationButtons, setShowFinishOperationButtons] =
     useState(false);
   const [showActualMoney, setShowActualMoney] = useState(true);
+  // eslint-disable-next-line
   const [supervisorName, setSupervisorName] = useState();
   const [usdDenomination, setUsdDenomination] = useState([]);
   const [usdBills, setUsdBills] = useState(0);
@@ -142,7 +143,7 @@ const Register = (props) => {
     register.Bills = balanceMadeBySupervisor ? billsBySupervisor : bills;
     if (balanceMadeBySupervisor) {
       register.Authorizing = {
-        FullName: supervisorName,
+        FullName: "Milagros Doldan",
         Role: "Jefe de cajas",
       };
     }
@@ -156,27 +157,24 @@ const Register = (props) => {
     register.TotalOut = parseFloat(
       register.TotalPaidTickets.toFixed(register.Round)
     );
+
+    register.BalanceBySupervisor = balanceMadeBySupervisor;
     register.TotalBills = balanceMadeBySupervisor
-      ? register.FailedBalance.TotalAmount
+      ? totalBillsBySupervisor
       : register.TotalAmount;
 
     register.Tolerance = Number(tolerance);
-    register.OverTolerance = Math.abs(register.Balance) > register.Tolerance;
-    register.UnderTolerance = Math.abs(register.Balance) < -register.Tolerance;
-    if (register?.FailedBalance?.BalanceBySupervisor) {
-      register.OverToleranceBySupervisor =
-        Math.abs(register.FailedBalance.BalanceBySupervisor) >
-        register.Tolerance;
-      register.UnderToleranceBySupervisor =
-        Math.abs(register.FailedBalance.BalanceBySupervisor) <
-        -register.Tolerance;
+
+    if (balanceMadeBySupervisor) {
+      register.OverToleranceBySupervisor = register.OverTolerance;
+      register.UnderToleranceBySupervisor = register.UnderTolerance;
     }
 
     const url =
       "https://audit.overview.casino/cashier-register/6a345f90-3cbd-4446-8779-64c2fc52480b";
 
-    Printer.makeQr(url).then((qr) => {
-      Printer.print(print(register, qr, url), (err) =>
+    Hardware.Device.Printer.makeQr(url).then((qr) => {
+      Hardware.Device.Printer.print(print(register, qr, url), (err) =>
         NotifyUser.Error("Problemas para imprimir: " + err)
       );
     });
@@ -233,14 +231,19 @@ const Register = (props) => {
       BalanceID: register.ID,
     }).then(({ data }) => {
       setRegister({ ...register, FailedBalance: data.FailedBalance });
-      register.BalanceBySupervisor = data.FailedBalance.BalanceBySupervisor;
-      setBalanceMadeBySupervisor(data.FailedBalance.BalanceBySupervisor);
-      Math.abs(data.FailedBalance.BalanceBySupervisor) <= tolerance
-        ? setCloseWithoutFail(true)
-        : setCloseWithFail(true);
+      register.OverTolerance = data.OverTolerance;
+      register.UnderTolerance = data.UnderTolerance;
+      register.BalanceBySupervisor = data.SupervisorInfo.BalanceBySupervisor;
+      setBalanceMadeBySupervisor(data.SupervisorInfo.BalanceBySupervisor);
+      if (data.OverTolerance) {
+        setCloseWithFail(true);
+      }
+      if (data.UnderTolerance) {
+        setCloseWithoutFail(true);
+      }
     });
   };
-
+  console.log("balanceMadeBySupervisor", balanceMadeBySupervisor);
   return (
     <>
       <Grid
@@ -304,6 +307,12 @@ const Register = (props) => {
             showAccordionInformation={showAccordionInformation}
             totalUsdBills={totalUsdBills}
           />
+
+          {showAlertFailedBalance && (
+            <Alert severity="error">
+              ARQUEO DE CAJA CON FALLO, por favor llama a tu supervisor.
+            </Alert>
+          )}
 
           <Grid item sx={{ flexDirection: "column" }} container>
             <Grid item>

@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from "react";
-import { BarcodeReaderContext } from "@oc/barcode-reader-context";
 import {
   TextField,
   CircularProgress,
@@ -22,14 +21,14 @@ import { ApiContext } from "@oc/api-context";
 import ListTickets from "../component/ListTickets";
 import Ticket from "../component/Ticket";
 import { Cancel } from "@mui/icons-material";
-import { TclPrinterContext } from "@oc/tcl-printer-context";
-import { FormatLocalCurrency } from "../utils/Intl";
+// import { TclPrinterContext } from "../context/TclPrinterContext";
+import { FormatLocalCurrency, FormatLocalDateTime, FormatLocalTime } from "../utils/Intl";
+import { HardwareContext } from "@oc/hardware-context";
+import { useLayoutEffect } from "react";
 // eslint-disable-next-line
 const Pay = ({ userMenuRef }) => {
   const { Get, Put, Post } = useContext(ApiContext);
-  const { BarcodeReader } = useContext(BarcodeReaderContext);
   // eslint-disable-next-line
-  const { Printer } = useContext(TclPrinterContext);
   const NotifyUser = useContext(NotifyUserContext);
   const [loadingTicket, setLoadingTicket] = useState(false);
   const [ticketNumber, setTicketNumber] = useState("");
@@ -39,8 +38,12 @@ const Pay = ({ userMenuRef }) => {
   const [retAmount, setRetAmount] = useState(0);
   const [payAmount, setPayAmount] = useState(0);
   const [thereArePayedTickets, setThereArePayedTickets] = useState(false);
+  const [ notPayableTicket, setNotPayableTicket ] = useState({})
   const [payInProcess, setPayInProcess] = useState(false);
+  const [ thereIsNotPayableTicket, setThereIsNotPayableTicket ] = useState(false)
+  // eslint-disable-next-line
   const [changeTicket, setChangeTicket] = useState();
+  const Hardware = useContext(HardwareContext);
 
   const style = {
     inputField: {
@@ -56,27 +59,34 @@ const Pay = ({ userMenuRef }) => {
     },
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (thereArePayedTickets) {
       handleTicketNumberClean();
       return;
     }
 
-    if (BarcodeReader.data) {
-      if (BarcodeReader.data.length === 19) {
-        const number = BarcodeReader.data.toString();
-        const ticket = number.substring(0, number.length - 1);
-        setTicketNumber(ticket);
-      } else if (BarcodeReader.data.length === 18) {
-        setTicketNumber(BarcodeReader.data);
-      } else {
-        NotifyUser.Info("Error leyendo el ticket, reintente.");
-      }
-      BarcodeReader.clear();
+    if (Hardware.Device.BarcodeScanner === undefined ||Hardware.Device.BarcodeScanner.status() !== true ) {
+      NotifyUser.Error("Problemas comunicando con el scanner.")
+      return;
     }
 
+    return Hardware.Device.BarcodeScanner.onDataListener((data) => {
+      if (data) {
+        if (data.length === 19) {
+          const number = data.toString();
+          const ticket = number.substring(0, number.length - 1);
+          setTicketNumber(ticket);
+        } else if (data.length === 18) {
+          setTicketNumber(data);
+        } else {
+          NotifyUser.Info("Error leyendo el ticket, reintente.");
+        }
+        Hardware.Device.BarcodeScanner.clear();
+      }
+    });
+
     // eslint-disable-next-line
-  }, [BarcodeReader.data]);
+  }, []);
 
   useEffect(() => {
     if (ticketNumber.length === 18) {
@@ -95,20 +105,33 @@ const Pay = ({ userMenuRef }) => {
           if (data.RedeemedAt) {
             setPayedTicket(data);
             setThereArePayedTickets(true);
+            return
           } else {
             const ID = data.ID.toString();
             Put("/ticket/v1/prepare-payment", {
               ID: ID,
               Status: true,
-            }).catch((err) => console.log(err));
-            const tks = [...tickets, data];
-            setTickets(tks);
-            const tot = tks.reduce((prev, curr) => prev + curr.Amount, 0);
-            const pay = Math.floor(tot / 100) * 100;
-            setTotalAmount(tot);
-            setPayAmount(pay);
-            setRetAmount(tot - pay);
-            setTicketNumber("");
+            }).then(() => {
+              const tks = [...tickets, data];
+              setTickets(tks);
+              const tot = tks.reduce((prev, curr) => prev + curr.Amount, 0);
+              const pay = Math.floor(tot / 100) * 100;
+              setTotalAmount(tot);
+              setPayAmount(pay);
+              setRetAmount(tot - pay);
+              setTicketNumber("");
+              setThereIsNotPayableTicket(false);
+              setNotPayableTicket({})
+            })
+            .catch((err) => {
+              if(err.response.data.Error === "TICKET_STATUS_UNAUTHORIZED"){
+                setThereIsNotPayableTicket(true);
+                setNotPayableTicket(data);
+                return;
+              }
+            }
+            );
+        
           }
         })
         .catch((err) => {
@@ -130,6 +153,8 @@ const Pay = ({ userMenuRef }) => {
     // eslint-disable-next-line
   }, [ticketNumber]);
 
+
+  console.log(notPayableTicket)
   const handleRemoveTicket = (ticket) => {
     const ID = ticket.ID.toString();
     Put("/ticket/v1/prepare-payment", {
@@ -155,9 +180,12 @@ const Pay = ({ userMenuRef }) => {
     setTicketNumber("");
     setPayedTicket(false);
     setThereArePayedTickets(false);
+    setNotPayableTicket({});
+    setThereIsNotPayableTicket(false);
   };
 
   const handlePay = () => {
+    if(Hardware.Device.TclPrinter.status() === true){ 
     const vuelto = parseFloat(retAmount.toFixed(2));
     Post("/register/v1/cashier", {
       TicketsArray: tickets,
@@ -168,46 +196,75 @@ const Pay = ({ userMenuRef }) => {
         setPayInProcess(true);
 
         if (retAmount > 0.1) {
-          Printer.print({
-            barCode: `${data.Barcode}`,
-            side: "Ticket de vuelto",
-            validityDays: 30,
-            value: data.Amount,
-            date: Date.now(),
-            number: 9876543210,
-            header: "Ticket de Vuelto",
-            titleLeft: "Av. Patricio Peralta Ramos 2100",
-            titleRight: "Mar Del Plata",
-            footer: "No valido para cobrar en caja",
-          });
+           Hardware.Device.TclPrinter.print(
+          {
+            side: "Ticket",
+            validityDays: 125,
+            H3: "Ticket de Demo",
+            SH1: "Terminal",
+            SH2: "de test",
+            H1: "OVERVIEW.CASINO",
+            BC1:"VALIDATION",
+            BC2: data.Barcode,
+            BBC1: FormatLocalDateTime(Date.now()),
+            BBC2: FormatLocalTime(Date.now()),
+            BBC3: `Vale ${data.ID}`,
+            D1: "",
+            D2: "",
+            H2: `$${data.Amount}`,
+            F1: "30 dias",
+            F2: "No válido para cobrar por caja",
+            Number: 9876543211,
+          }
+
+        );
         }
       })
       .catch((IDs) => {
         NotifyUser.Error("Algunos tickets no pueden ser cobrados.");
-      });
+      })
+    } else {
+      NotifyUser.Error("Problemas para comunicarse con la impresora. ")
+    }
   };
 
   const reImprimir = () => {
     if (retAmount > 0.1) {
-      Printer.print({
-        barCode: `${changeTicket.Barcode}`,
-        side: "Ticket de vuelto",
-        validityDays: 30,
-        value: changeTicket.Amount,
-        date: Date.now(),
-        number: 9876543210,
-        header: "Ticket de Vuelto",
-        titleLeft: "Av. Patricio Peralta Ramos 2100",
-        titleRight: "Mar Del Plata",
-        footer: "No valido para cobrar en caja",
-      });
-    }
+      Hardware.Device.TclPrinter.print(
+     {
+       side: "Ticket",
+       validityDays: 125,
+       H3: "Ticket de Demo",
+       SH1: "Terminal",
+       SH2: "de test",
+       H1: "OVERVIEW.CASINO",
+       BC1:"VALIDATION",
+       BC2: changeTicket.Barcode,
+       BBC1: FormatLocalDateTime(Date.now()),
+       BBC2: FormatLocalTime(Date.now()),
+       BBC3: `Vale ${changeTicket.ID}`,
+       D1: "",
+       D2: "",
+       H2: `$${changeTicket.Amount}`,
+       F1: "30 dias",
+       F2: "No válido para cobrar por caja",
+       Number: 9876543211,
+     }
+
+   );
+   }
   };
 
   const handleFinish = () => {
+    setPayInProcess(false);
+    setTickets([]);
+    setPayAmount(0);
+    setRetAmount(0);
+    setTotalAmount(0);
+    setTicketNumber("");
     const ID = changeTicket.ID.toString();
     Put(`/ticket/v1/to-redeem`, { ID: ID })
-      .then(({ data }) => {
+      .then((data) => {
         setPayInProcess(false);
         setTickets([]);
         setPayAmount(0);
@@ -336,8 +393,8 @@ const Pay = ({ userMenuRef }) => {
               </Typography>
             </Button>
           </Grid>
-          {payedTicket ? (
-            <Ticket data={payedTicket} />
+          {payedTicket || thereIsNotPayableTicket  ? (
+            <Ticket payedTicket={payedTicket && payedTicket} notPayableTicket={notPayableTicket && notPayableTicket} thereIsNotPayableTicket={thereIsNotPayableTicket} thereArePayedTickets={thereArePayedTickets}  />
           ) : (
             <ListTickets tickets={tickets} removeTicket={handleRemoveTicket} />
           )}
@@ -359,7 +416,7 @@ const Pay = ({ userMenuRef }) => {
       <Dialog
         open={payInProcess}
         // open={true}
-        onClose={() => setPayInProcess(false)}
+
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         sx={{ padding: "50px" }}

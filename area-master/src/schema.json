@@ -1,0 +1,127 @@
+{
+  "type": "object",
+  "properties": {
+    "Name": {
+      "title": "Nombre",
+      "type": "string"
+    },
+    "Parent": {
+      "title": "Parent",
+      "type": "string",
+      "enum": [
+        {
+          "ID": {
+            "title":"ID",
+            "type": "string"
+          },
+          "Name":{
+            "title":"Name",
+            "type": "string"
+          }, 
+          "Parents" : {
+            "title":"Parents", 
+            "type":"array",
+            "enum": {
+              "type": "string",
+              "enum": [
+                "foo",
+                "bar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+
+    "Avatar": {
+      "title": "Avatar",
+      "type": "string",
+      "contentEncoding": "base64",
+      "contentMediaType": "image/jpeg"
+    },
+    "Address": {
+      "type": "object",
+      "properties": {
+        "Line1": {
+          "title": "Dirección",
+          "type": "string"
+        },
+        "Line2": {
+          "title": "Dirección 2",
+          "type": "string"
+        },
+        "Area": {
+          "title": "Zona",
+          "type": "string"
+        },
+        "Location": {
+          "title": "Ciudad",
+          "type": "string"
+        },
+        "Region": {
+          "title": "Provincia",
+          "type": "string"
+        },
+        "Zip": {
+          "title": "Código Postal",
+          "type": "string"
+        },
+        "Country": {
+          "title": "Pais",
+          "type": "string"
+        }
+      }
+    },
+
+    "ContactMethods": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "Medios de contacto",
+        "label": "Medios de contacto",
+        "properties": {
+          "Type": {
+            "title": "Tipo",
+            "type": "string",
+            "enum": [
+              "phone",
+              "whatsapp",
+              "telegram",
+              "instagram",
+              "messenger",
+              "landphone"
+            ]
+          },
+          "Value": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "Country": {
+                    "type": "number"
+                  },
+                  "Region": {
+                    "type": "number"
+                  },
+                  "IsMobile": {
+                    "type": "boolean"
+                  },
+                  "Number": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "Description": {
+            "title": "Descripción",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

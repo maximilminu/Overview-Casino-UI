@@ -13,23 +13,21 @@ import UserProvider from "@oc/user-context";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <SnackbarProvider>
-    <NotifyUserProvider>
-      <ApiProvider>
-        <ConfigProvider>
-          <ThemeProvider>
-            <UserProvider>
-              <EscPosPrinterProvider>
+  <HardwareProvider>
+    <SnackbarProvider>
+      <NotifyUserProvider>
+        <ApiProvider>
+          <ConfigProvider>
+            <ThemeProvider>
+              <UserProvider>
                 <TclPrinterProvider>
-                  <BarcodeReaderProvider>
-                    <Router />
-                  </BarcodeReaderProvider>
+                  <Router />
                 </TclPrinterProvider>
-              </EscPosPrinterProvider>
-            </UserProvider>
-          </ThemeProvider>
-        </ConfigProvider>
-      </ApiProvider>
-    </NotifyUserProvider>
-  </SnackbarProvider>
+              </UserProvider>
+            </ThemeProvider>
+          </ConfigProvider>
+        </ApiProvider>
+      </NotifyUserProvider>
+    </SnackbarProvider>
+  </HardwareProvider>
 );
