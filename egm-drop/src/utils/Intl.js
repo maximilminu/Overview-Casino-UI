@@ -1,10 +1,11 @@
 const formatLocalCurrency = new Intl.NumberFormat("es-AR", {
   style: "currency",
-  maximumFractionDigits: 0,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
   currency: "ARG",
 });
 export const FormatLocalCurrency = (val) =>
-  formatLocalCurrency.format(val).replace("ARG", "$").replaceAll(".", " ");
+  formatLocalCurrency.format(val).replace("ARG", "$");
 
 const formatLocalDateTime = new Intl.DateTimeFormat("es-AR", {
   year: "numeric",

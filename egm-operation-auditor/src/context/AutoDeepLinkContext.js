@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ApiContext } from "@oc/api-context";
+import { ApiContext } from "./ApiContext";
 
 export const AutoDeepLinkContext = createContext();
 

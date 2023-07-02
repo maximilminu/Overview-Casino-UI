@@ -1,6 +1,6 @@
 import React, { useState, useContext, useLayoutEffect } from "react";
 import { Avatar, CircularProgress } from "@mui/material";
-import { ApiContext } from "../context/ApiContext";
+import { ApiContext } from "@oc/api-context";
 
 const AvatarComponent = (props) => {
   const [picture, setPicture] = useState(false);
@@ -15,9 +15,9 @@ const AvatarComponent = (props) => {
     ) {
       setLoading(true);
       Get(`/storage/avatar/${props.subject.ID}/1000?t=${Date.now()}`)
-        .then((res) => {
+        .then(({ data }) => {
           setLoading(false);
-          setPicture(res);
+          setPicture(data);
         })
         .catch((err) => {
           setLoading(false);

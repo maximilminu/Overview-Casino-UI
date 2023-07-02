@@ -1,18 +1,12 @@
-import { useRef } from "react";
 import React, { useContext, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { NotifyUserContext } from "@oc/notify-user-context";
-import { BarcodeReaderContext } from "@oc/barcode-reader-context";
+import { NotifyUserContext } from "../context/NotifyUserContext";
+import { BarcodeReaderContext } from "../context/BarcodeReaderContext";
 import { Box } from "@mui/material";
 import { useNavigate, Outlet, useMatches } from "react-router-dom";
 import AutoDeepLinkContext from "../context/AutoDeepLinkContext";
 const Home = () => {
-  const buttonsRef = useRef([]);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const [footerHeight, setFooterHeight] = useState(0);
-  // eslint-disable-next-line
-  const [disable, setDisable] = useState();
   const matches = useMatches();
   const { BarcodeReader } = useContext(BarcodeReaderContext);
   const NotifyUser = useContext(NotifyUserContext);
@@ -33,27 +27,22 @@ const Home = () => {
 
   return (
     <>
-      <Navbar
-        onHeightChange={setHeaderHeight}
-        buttonsRef={buttonsRef}
-        setValueTicket={setValueTicket}
-        valueTicket={valueTicket}
-      />
+      <Navbar setValueTicket={setValueTicket} valueTicket={valueTicket} />
       <Box
         sx={{
           position: "fixed",
-          top: headerHeight,
-          bottom: footerHeight,
+          top: "65px",
+          bottom: "49px",
           left: 0,
           right: 0,
-          overflow: "hidden",
+          overflow: "unset",
           backgroundColor: matches.length > 1 && "#eeeeeeb0",
         }}
       >
         <AutoDeepLinkContext />
         <Outlet />
       </Box>
-      <Footer disable={disable} onHeightChange={setFooterHeight} />
+      <Footer />
     </>
   );
 };
