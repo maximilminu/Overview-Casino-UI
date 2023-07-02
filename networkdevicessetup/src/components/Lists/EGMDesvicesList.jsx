@@ -46,7 +46,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const EGMDesvicesList = ({ egms }) => {
-  console.log(egms, "egms");
   const navigate = useNavigate();
 
   const handleClick = (device) => {
@@ -93,6 +92,8 @@ const EGMDesvicesList = ({ egms }) => {
                   },
                   cursor: "pointer",
                   transition: "all .2s ease-in",
+                  backgroundColor:
+                    device.Config.ConfigMode === true ? "primary.main" : undefined,
                 }}
                 onClick={() => {
                   handleClick(device);

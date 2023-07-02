@@ -1,6 +1,6 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "network-devices",
+  "version": "1.0.21-rc",
   "private": true,
   "homepage": "/network-devices",
   "dependencies": {
@@ -13,13 +13,14 @@
     "@mui/icons-material": "^5.10.9",
     "@mui/material": "^5.11.3",
     "@mui/x-date-pickers": "^5.0.9",
-    "@oc/api-context": "^1.0.12",
-    "@oc/auto-deeplink-context": "^1.0.4",
-    "@oc/barcode-reader-context": "^1.0.1",
-    "@oc/config-context": "^1.0.7",
-    "@oc/escpos-printer-context": "^1.0.1",
-    "@oc/notify-user-context": "^1.0.1",
-    "@oc/theme-context": "^1.0.7",
+
+    "@oc/api-context": "^1.0.17",
+    "@oc/config-context": "^1.0.11",
+    "@oc/hardware-context": "^1.0.10",
+    "@oc/notify-user-context": "^1.0.5",
+    "@oc/theme-context": "^1.0.13",
+    "@oc/user-context": "^1.0.8",
+
     "@svgr/webpack": "^6.5.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

@@ -3,7 +3,6 @@ import { Outlet, useMatches } from "react-router-dom";
 import Footer from "../components/Footer";
 import { Box } from "@mui/material";
 import Navbar from "../components/Navbar";
-import AutoDeepLinkProvider from "../context/AutoDeepLinkContext";
 
 const Home = () => {
   const matches = useMatches();
@@ -24,7 +23,6 @@ const Home = () => {
         }}
         component="main"
       >
-        <AutoDeepLinkProvider />
         <Outlet />
       </Box>
       <Footer onHeightChange={setFooterHeight} />

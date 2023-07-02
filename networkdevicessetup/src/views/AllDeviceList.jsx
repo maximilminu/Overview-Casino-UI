@@ -6,7 +6,13 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import PcDevicesList from "../components/Lists/PcDevicesList";
 import EGMDesvicesList from "../components/Lists/EGMDesvicesList";
-import { Outlet, useNavigate, useOutlet, useParams } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useOutlet,
+  useParams,
+} from "react-router-dom";
 import { useLayoutEffect } from "react";
 import { NotifyUserContext } from "@oc/notify-user-context";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
@@ -64,7 +70,7 @@ const AllDeviceList = () => {
   const [privateKiosksDevices, setPrivateKiosksDevices] = useState([]);
   const NotifyUser = useContext(NotifyUserContext);
   const [devicesTypes, setDevicesTypes] = useState({});
-
+  const url = useLocation().pathname;
   useLayoutEffect(() => {
     setValue(parseInt(type));
   }, [type]);
@@ -106,7 +112,7 @@ const AllDeviceList = () => {
       });
 
     // eslint-disable-next-line
-  }, []);
+  }, [url]);
 
   const devicesList = (type) => {
     switch (type) {
@@ -167,7 +173,7 @@ const AllDeviceList = () => {
         aria-label="nav tabs example"
       >
         {devicesTypes &&
-          Object.keys(devicesTypes).map((key) => {
+          Object.keys(devicesTypes).map((key,index) => {
             return key !== "0" ? (
               <Tab
                 sx={{
@@ -179,12 +185,14 @@ const AllDeviceList = () => {
                 onClick={() => {
                   handleClick(key);
                 }}
-                key={devicesTypes[key]}
+                key={index}
                 label={devicesTypes[key]}
                 {...a11yProps(key)}
               />
             ) : (
-              <Tooltip title="Nuevo dispositivo">
+              <Tooltip title="Nuevo dispositivo"
+                key={index}
+              >
                 <Tab
                   onClick={() => {
                     handleClick(key);

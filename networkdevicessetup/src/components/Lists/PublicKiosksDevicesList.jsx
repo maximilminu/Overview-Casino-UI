@@ -87,6 +87,8 @@ const PublicKiosksDevicesList = ({ publicKiosksDevices }) => {
             publicKiosksDevices.map((device) => (
               <StyledTableRow
                 sx={{
+                  backgroundColor:
+                  device.Config.ConfigMode === true ? "primary.main" : undefined,
                   "&:last-child td, &:last-child th": { border: 0 },
                   " &:hover": {
                     backgroundColor: "#e5e5e5",

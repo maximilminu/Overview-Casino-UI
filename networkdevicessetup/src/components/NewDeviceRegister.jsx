@@ -23,7 +23,6 @@ import CheckIcon from "@mui/icons-material/Check";
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { ApiContext } from "@oc/api-context";
-
 const style = {
   tableCell: {
     width: "250px",
@@ -50,27 +49,32 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-function createData(name, quantity) {
-  return { name, quantity };
-}
-
-const rol = [
-  createData("Caja", 50),
-  createData("CPU", 40),
-  createData("Terminal de Autogestión", 33),
-  createData("Cajero Automático", 0),
-];
-
 const NewDeviceRegister = ({ device, setDispatchGet }) => {
   const { id } = useParams();
-  const { Get, Post } = useContext(ApiContext);
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
+  const { Get, Post, Patch } = useContext(ApiContext);
+  const [selectedRol, setSelectedRol] = useState({});
   const [area, setArea] = useState("");
   const [inputAutocomplete, setInputAutocomplete] = useState();
   const [areaResults, setAreaResults] = useState([]);
   const [areaDescription, setAreaDescription] = useState("");
   const [loadingApi, setLoadingApi] = useState(false);
+  const [networkProfile, setNetworkProfile] = useState([])
+  const [selectedPeriferals, setSelectedPeriferals] = useState([])
+  const [networkDevicePayload, setNetworDevicePayload] = useState({
+      Name:null,
+      ProfileID:null,
+      AreaID :null,
+  })
+
+  useEffect(()=>{
+    Get(`/network-device/v1/get-profiles`)
+    .then(({ data }) => { 
+      setNetworkProfile(data)
+      
+    })
+    .catch((err) => console.log(err));
+    // eslint-disable-next-line
+  },[])
 
   useEffect(() => {
     if (inputAutocomplete) {
@@ -83,8 +87,9 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
       setLoadingApi(true);
       Get(`/area/v1/autocomplete/?Name=${area}`)
         .then(({ data }) => {
-          console.log(data, "data");
           const areaDescribe = data.map((area) => area.Describe);
+          console.log(data)
+          setNetworDevicePayload({...networkDevicePayload, AreaID:data[0].ID})
           setAreaResults(areaDescribe.flat());
         })
         .catch((err) => console.log(err));
@@ -96,14 +101,35 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
   }, [area]);
 
   const handleConfirmEdition = () => {
-    Post(`/network-device/v1/config-network-device/${id}`, {
-      Name: name,
-      Profile: role,
-      AreaID: area,
-    }).then(({ data }) => {
+    console.log(networkDevicePayload)
+    Post(`/network-device/v1/config-network-device/${id}`, networkDevicePayload)
+    .then(({ data }) => {
+      console.log(data)
+      Patch(`/network-device/v1/config-update/${id}`, [
+        {
+          op: "add",
+          path: `/Config/ConfigMode`,
+          value: true,
+        },
+      ]).then(({ data }) => console.log(data));
+
       setDispatchGet(true);
     });
   };
+
+  const selectedProfile = (e) =>{
+    if(networkProfile){
+      const selected = networkProfile.find(profile=>profile.Name===e.target.value)
+      console.log(selected)
+      setNetworDevicePayload({
+        ...networkDevicePayload,
+        ProfileID:selected.Id,
+      })
+      setSelectedRol(selected)
+      setSelectedPeriferals(selected.Peripherals)
+    }
+  }
+
 
   return (
     device && (
@@ -118,6 +144,7 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
             marginBottom: "5px",
             height: "100%",
           }}
+
         >
           <Grid item sx={{ width: "90%", height: "100%", margin: "0 auto" }}>
             <Paper sx={{ height: "90%", overflow: "auto" }}>
@@ -125,9 +152,7 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                 <Table size="small" sx={style.table}>
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell colSpan={8}>
-                        Configuración
-                      </StyledTableCell>
+                      <StyledTableCell colSpan={8}>Configuración</StyledTableCell>
                     </TableRow>
                   </TableHead>
                   <TableRow>
@@ -136,12 +161,13 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                       <TableCell>
                         <TextField
                           sx={{ marginLeft: "10px", width: "300px" }}
-                          onChange={(e) => setName(e.target.value)}
+                          onChange={(e) => setNetworDevicePayload({...networkDevicePayload, Name:e.target.value})}
                           size="small"
                           variant="standard"
                         />
                       </TableCell>
                     </TableRow>
+                    
                     <TableRow>
                       <TableCell sx={style.tableCell}>Área</TableCell>
                       <TableCell>
@@ -174,7 +200,7 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell sx={style.tableCell}>Rol</TableCell>
+                      <TableCell sx={style.tableCell}>Perfil</TableCell>
                       <TableCell>
                         <FormControl
                           size="small"
@@ -187,39 +213,56 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                         >
                           <Select
                             size="small"
-                            value={role}
-                            onChange={(event) => setRole(event.target.value)}
+                            value={selectedRol.Name}
+                            onChange={selectedProfile}
                             label="role"
                           >
-                            {rol.map((oneRole) => (
+                            {networkProfile.map((oneRole,index) => (
                               <MenuItem
                                 size="small"
-                                value={oneRole.name}
-                                key={oneRole.name}
+                                value={oneRole.Name}
+                                key={index}
                               >
-                                {oneRole.name}
+                                {oneRole.Name}
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
                       </TableCell>
                     </TableRow>
+
                     <TableRow>
-                      <TableCell sx={style.tableCell}>
-                        IdlSecondsTimeout
+                      <TableCell sx={style.tableCell}>IP</TableCell>
+                      <TableCell>
+                        <TextField
+                          sx={{ marginLeft: "10px", width: "300px" }}
+                          onChange={(e) => setNetworDevicePayload({...networkDevicePayload, IP:e.target.value})}
+                          size="small"
+                          variant="standard"
+                        />
                       </TableCell>
-                      <TableCell></TableCell>
+                    </TableRow>
+
+
+                    <TableRow>
+                      <TableCell sx={style.tableCell}>Tempo de Sesión</TableCell>
+                      <TableCell>{selectedRol.IdleSecondsTimeout && selectedRol.IdleSecondsTimeout}</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell sx={style.tableCell}>IdleForceUrl</TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell sx={style.tableCell}>Periféricos</TableCell>
+                      <TableCell sx={style.tableCell}>Url Forzada</TableCell>
+                      <TableCell>{selectedRol.IdleForceUrl && selectedRol.IdleForceUrl}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell sx={style.tableCell}>Url</TableCell>
-                      <TableCell></TableCell>
+                      <TableCell>{selectedRol.DefaultUrl && selectedRol.DefaultUrl}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell sx={style.tableCell}>Periféricos</TableCell>
+                      <TableCell>
+                        {selectedPeriferals?.length>0 ? null : Object.keys(selectedPeriferals).map(
+                          (Key,index) =>
+                            (selectedPeriferals[Key].Name + (index+1 === Object.keys(selectedPeriferals)?.length ? " ":", "))) }
+                      </TableCell>
                     </TableRow>
                   </TableRow>
                 </Table>
@@ -260,9 +303,7 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                       </TableRow>
 
                       <TableRow>
-                        <TableCell sx={style.tableCell}>
-                          Número de Serie
-                        </TableCell>
+                        <TableCell sx={style.tableCell}>Número de Serie</TableCell>
                         <TableCell>{device["SerialNumber"]}</TableCell>
                       </TableRow>
                       {device.Type !== 1 && (
@@ -284,9 +325,7 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                             <TableCell>{device["Properties"]["CPU"]}</TableCell>
                           </TableRow>
                           <TableRow>
-                            <TableCell sx={style.tableCell}>
-                              Sistema Operativo
-                            </TableCell>
+                            <TableCell sx={style.tableCell}>Sistema Operativo</TableCell>
                             <TableCell>{device["Properties"]["OS"]}</TableCell>
                           </TableRow>
                           <TableRow>
@@ -346,12 +385,8 @@ const NewDeviceRegister = ({ device, setDispatchGet }) => {
                         <TableRow>
                           <TableCell sx={style.tableCell}>{e.ID}</TableCell>
                           <TableCell>Nombre: {e.Name || "Sin datos"}</TableCell>
-                          <TableCell>
-                            Manufactura: {e?.Manufacturer || "Sin datos"}
-                          </TableCell>
-                          <TableCell>
-                            Producto: {e.Product || " Sin datos"}
-                          </TableCell>
+                          <TableCell>Manufactura: {e?.Manufacturer || "Sin datos"}</TableCell>
+                          <TableCell>Producto: {e.Product || " Sin datos"}</TableCell>
                         </TableRow>
                       );
                     })}

@@ -13,7 +13,7 @@ const InteractionDevicesIcon = memo((props) => {
       return <VideoCameraFrontOutlinedIcon {...props} />;
     case "BarcodeScanner":
       return <QrCodeScannerIcon {...props} />;
-    case "EscPosPrinter":
+    case "Printer":
       return <PrintOutlinedIcon {...props} />;
     case "TclPrinter":
       return <TclPrinter {...props} />;

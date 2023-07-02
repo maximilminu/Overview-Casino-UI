@@ -8,13 +8,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import React from "react";
 import InteractionDevicesIcon from "../InteractionDevicesIcon";
 import { useNavigate } from "react-router-dom";
-
+import DescribeText from "../DescribeText";
 const style = {
   tableCell: {
     fontWeight: "700",
@@ -24,7 +23,6 @@ const style = {
     backgroundColor: "#ffffff",
   },
 };
-
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
@@ -36,9 +34,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const StyledTableRow = styled(TableRow)(({ theme,backgroundColorr }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor:backgroundColorr || theme.palette.action.hover,
   },
   "&:last-child td, &:last-child th": {
     border: 0,
@@ -79,47 +77,55 @@ const PrivateKiosksDevicesList = ({ privateKiosksDevices }) => {
               <StyledTableCell sx={style.tableCell}>
                 Descripción
               </StyledTableCell>
-              <StyledTableCell sx={style.tableCell}>Ubicación</StyledTableCell>
+              <StyledTableCell sx={style.tableCell}>Area</StyledTableCell>
               <StyledTableCell sx={style.tableCell}>IP</StyledTableCell>
-              <StyledTableCell sx={style.tableCell}>Rol</StyledTableCell>
-              <StyledTableCell sx={style.tableCell}>
-                Periféricos
-              </StyledTableCell>
+              <StyledTableCell sx={style.tableCell}>Perfil</StyledTableCell>
+              <StyledTableCell sx={style.tableCell}>Periféricos</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
+          
             {privateKiosksDevices &&
-              privateKiosksDevices.map((device) => (
+              privateKiosksDevices.map((device, index) =>(
+                device.Config && (
                 <StyledTableRow
+                  backgroundColorr={device.Config.ConfigMode ? "primary.main" : false}
                   sx={{
+                    backgroundColor: device.Config.ConfigMode ? "primary.main" : null,
                     "&:last-child td, &:last-child th": { border: 0 },
-                    " &:hover": {
-                      backgroundColor: "#e5e5e5",
-                    },
+                    " &:hover": {backgroundColor: "#e5e5e5"},
                     cursor: "pointer",
                     transition: "all .2s ease-in",
                   }}
-                  onClick={() => {
-                    handleClick(device);
-                  }}
-                  key={device.ID}
-                >
-                  <TableCell align="center">
-                    {device["Config"]["Name"]}
-                  </TableCell>
+                  onClick={() => {handleClick(device)}}
+                  key={index}
+                  >
+                  <TableCell align="center">{device.Config.Name}</TableCell>
                   <TableCell align="center">
                     {device["Properties"]["Brand"]}{" "}
                     {device["Properties"]["Model"]}
                   </TableCell>
+                  
+
+
+
+
                   <TableCell align="center">
-                    {device["Config"]["AreaID"]}
+                    <DescribeText
+                          otherPath={`/network-device/v1/describe-area/${device.Config.AreaID}`}
+                          style={{padding:"6px 16px"}}
+                        />
                   </TableCell>
+
+
+
+
                   <TableRow align="center">
-                    {Object.keys(device["Properties"]["NICs"]).map((key) => (
-                      <TableCell>
+                    {[Object.keys(device.Properties["NICs"])[0]].map((key,index) => (
+                      <TableCell key={index}>
                         {Object.keys(device["Properties"]["NICs"][key]).map(
-                          (subKey) => (
-                            <Typography sx={{ fontSize: "15px" }}>
+                          (subKey,index) => (
+                            <Typography sx={{ fontSize: "15px" }} key={index}>
                               {subKey}:
                               {device["Properties"]["NICs"][key][subKey]}
                             </Typography>
@@ -129,29 +135,40 @@ const PrivateKiosksDevicesList = ({ privateKiosksDevices }) => {
                     ))}
                   </TableRow>
                   <TableCell align="center">
-                    {device["Config"]["Profile"]}
+                    
+                  <TableCell align="center">
+                    <DescribeText
+                          otherPath={`/network-device/v1/describe-profile/${device.Config.ProfileID}`}
+                         
+                        />
+                  </TableCell>
+
+
+
                   </TableCell>
                   <TableCell align="center">
                     {device["Config"]["Peripherals"]
-                      ? Object.keys(device["Config"]["Peripherals"]).map(
-                          (key) => (
-                            <Tooltip
-                              key={device["Config"]["Peripherals"][key]}
-                              title={device["Config"]["Peripherals"][key]}
-                            >
-                              <i>
-                                <InteractionDevicesIcon
-                                  media={key}
-                                  width={24}
-                                  height={24}
-                                />
-                              </i>
-                            </Tooltip>
-                          )
+                      ? Object.keys(device.Config["Peripherals"]).map((key,index) => (
+                        
+                            //  <Tooltip
+                            //    sx={{pointer:"none"}}
+                            //    key={index}
+                            //    title={device["Config"]["Peripherals"][key]}
+                            //  >
+                               <i style={{pointer:"none"}}>
+                                 <InteractionDevicesIcon
+                                   media={key}
+                                   width={24}
+                                   height={24}
+                                 />
+                               </i>
+                            //  </Tooltip>
+                      )
                         )
                       : null}
                   </TableCell>
                 </StyledTableRow>
+                )
               ))}
           </TableBody>
         </Table>
