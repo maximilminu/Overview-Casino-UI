@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState, useLayoutEffect } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { Outlet, useLocation, useMatches, useNavigate } from "react-router-dom";
@@ -8,10 +14,12 @@ import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { MemberContext } from "../context/MemberContext";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { HardwareContext } from "@oc/hardware-context";
+import { ConfigContext } from "@oc/config-context";
 
+import dayjs from "dayjs"
 const Home = () => {
   const [client, setClient] = useState();
-  const Hardware = useContext(HardwareContext)
+  const Hardware = useContext(HardwareContext);
   const NotifyUser = useContext(NotifyUserContext);
   const { Get } = useContext(ApiContext);
   const navigate = useNavigate();
@@ -27,16 +35,34 @@ const Home = () => {
   const [dataForCreateUser] = useState();
   const navBarSearchListeners = useRef({});
   const navBarSearchListenersIds = useRef(0);
-  const location = useLocation();
+  // eslint-disable-next-line
+  const [visitQuantity, setVisitQuantity] = useState(false);
+  const config = useContext(ConfigContext);
+  useLayoutEffect(() => {
+    const int = setInterval(() => {
+      Get("/visit/v1/daily-count").then(({ data }) => {
+        setVisitQuantity(data.CheckInQuantity);
+      });
+    }, 5000);
+
+    return () => {
+      clearInterval(int);
+    };
+    // eslint-disable-next-line
+  }, []);
+
+
 
   useLayoutEffect(() => {
-    Hardware.ConnectAll().then(ret => {
-      console.log('Devices initialized:', ret);
-    }).catch(err => {
-      console.log('Problems connecting devices:', err);
-    })
-  }, [Hardware]);
-  
+    Hardware.ConnectAll()
+      .then((ret) => {
+        console.log("Devices initialized:", ret);
+      })
+      .catch((err) => {
+        console.log("Problems connecting devices:", err);
+      });
+  }, []);
+
   useEffect(() => {
     if (!url.includes("check-in")) {
       setMember(null);
@@ -45,8 +71,28 @@ const Home = () => {
   }, [url]);
 
   useLayoutEffect(() => {
-    if (Hardware.Device.BarcodeScanner === undefined) return;
+    if (Hardware.Device.BarcodeScanner === undefined || Hardware.Device.BarcodeScanner.status() === false) {
+    NotifyUser.Error("Problemas comunicando con el scanner.")
+    return;
+  }
     return Hardware.Device.BarcodeScanner.onDataListener((data) => {
+      if (data.includes(config && config.TicketInformation && config.TicketInformation.QrUrlCheckIn)) {
+        const initialArray = data.split("/");
+        const visitID = initialArray[initialArray.length - 1];
+        Get(`/visit/v1/by-id/${visitID}`)
+          .then(({ data }) => {
+            navigate(
+              `/front-desk/member-list/${data.Name}/view-single-member/${data.MemberID}/${visitID}`
+            );
+          })
+          .catch((err) => {
+            if (err.response.status === 404) {
+              NotifyUser.Error(
+                "No se encontraron tickets que coincidan con tu búsqueda."
+              );
+            }
+          });
+      }
       const dni = data.split("@");
       try {
         if (dni.length > 2) {
@@ -55,14 +101,14 @@ const Home = () => {
               Name: dni[5],
               Lastname: dni[4],
               LegalID: dni[1].replaceAll(" ", ""),
-              Birthdate: dni[7],
+              Birthdate: dayjs(dni[7], config.DisplayFormats.Date),
             });
           } else {
             setClient({
               Name: dni[2],
               Lastname: dni[1],
               LegalID: dni[4],
-              Birthdate: dni[6],
+              Birthdate: dayjs(dni[6],config.DisplayFormats.Date),
             });
           }
         } else {
@@ -80,9 +126,9 @@ const Home = () => {
       } catch {
         NotifyUser.Warning("No se pudo leer el documento.");
       }
-    })
+    });
     // eslint-disable-next-line
-  }, []);
+  }, [Hardware]);
 
   useEffect(() => {
     if (client?.LegalID) {
@@ -100,23 +146,16 @@ const Home = () => {
       }
       Get(`/member/v1/by-legalID/${client.LegalID}`)
         .then(({ data }) => {
-            setMember(data);
-            setClient({});
-            navigate("check-in/confirm");
-          
-          // else {
-          //   const info = new URLSearchParams(client).toString();
-          //   if (url.includes("/front-desk/check-in/confirm")) {
-          //     setOpenDialog(true);
-          //     setDataForCreateUser(info);
-          //     return;
-          //   }
-            
+          setMember(data);
+          setClient({});
+          navigate("check-in/confirm");
         })
-        .catch(({response}) => {
+        .catch(({ response }) => {
           if (response.status === 404) {
             setClient({});
-            navigate(`/front-desk/add-member/${new URLSearchParams(client).toString()}`);
+            navigate(
+              `/front-desk/add-member/${new URLSearchParams(client).toString()}`
+            );
           } else {
             NotifyUser.Error(
               `Problemas con el servicio de registro de usuarios. Notifique al servicio técnicos (${response.status}).`
@@ -128,12 +167,10 @@ const Home = () => {
   }, [client]);
 
   const onSearch = (data) => {
-    if (location.pathname === "/front-desk") {
-      navigate(`/front-desk/member-list/${data}`);
-      Object.keys(navBarSearchListeners.current).forEach((listenerKey) => {
-        navBarSearchListeners.current[listenerKey](data);
-      });
-    }
+    navigate(`/front-desk/member-list/${data}`);
+    Object.keys(navBarSearchListeners.current).forEach((listenerKey) => {
+      navBarSearchListeners.current[listenerKey](data);
+    });
   };
 
   const onNavbarSearchListener = (listener) => {
@@ -150,7 +187,8 @@ const Home = () => {
         onHeightChange={setHeaderHeight}
         buttonsRef={buttonsRef}
         onSearch={onSearch}
-      />{" "}
+        counter={visitQuantity}
+      />
       <Box
         component="main"
         sx={{
@@ -163,13 +201,12 @@ const Home = () => {
           backgroundColor: matches.length > 1 && "#eeeeeeb0",
         }}
       >
-        { (!Hardware.Device.BarcodeScanner.status() || !Hardware.Device.Printer.status() || !Hardware.Device.Camera.status()) ? 'Error de configuración de terminal. Para poder correr esta aplicación necesita al menos una Impresora, un Scanner y una Cámara.' :
-          <Outlet
+        <Outlet
             context={{
               onNavbarSearchListener,
             }}
           />
-        }
+
         <ConfirmDialog
           open={openDialog}
           onClose={() => setOpenDialog(false)}

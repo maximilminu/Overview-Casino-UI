@@ -6,127 +6,173 @@ import { FormHelperText, Hidden } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
-	createOnChangeHandler,
-	getData,
-	ResettableTextField,
-	useFocus,
+  MaterialInputControl,
+  ResettableTextField,
+  useFocus,
 } from "@jsonforms/material-renderers";
 import { Box } from "@mui/material";
+import { debounce } from "lodash";
+import dayjs from "dayjs";
 
-export const MaterialDateControl = (props) => {
-	const [focused, onFocus, onBlur] = useFocus();
-	const {
-		description,
-		id,
-		errors,
-		label,
-		uischema,
-		visible,
-		enabled,
-		required,
-		path,
-		handleChange,
-		data,
-		config,
-	} = props;
-	const isValid = errors.length === 0;
-	const appliedUiSchemaOptions = merge({}, config, uischema.options);
-	const showDescription = !isDescriptionHidden(
-		visible,
-		description,
-		focused,
-		appliedUiSchemaOptions.showUnfocusedDescription
-	);
+const EnrichmentDatePicker = (metaProps) => {
+  const MaterialDateControl = (props) => {
+    const [focused, onFocus, onBlur] = useFocus();
+    const {
+      description,
+      id,
+      errors,
 
-	const format = appliedUiSchemaOptions.dateFormat ?? "YYYY-MM-DD";
-	const saveFormat = appliedUiSchemaOptions.dateSaveFormat ?? "YYYY-MM-DD";
+      uischema,
+      visible,
+      enabled,
+      required,
+      path,
+      type,
+      handleChange,
+      data,
+      config,
+    } = props;
 
-	const views = appliedUiSchemaOptions.views ?? ["year", "day"];
+    const createOnChangeHandler =
+      (path, handleChange) => (time, textInputValue) => {
+        if (!time) {
+          handleChange(path, undefined);
+          return;
+        }
+        const result = time.valueOf();
+        handleChange(path, result === "Invalid Date" ? textInputValue : result);
+      };
 
-	const firstFormHelperText = showDescription
-		? description
-		: !isValid
-		? errors
-		: null;
-	const secondFormHelperText = showDescription && !isValid ? errors : null;
-	const onChange = useMemo(
-		() => createOnChangeHandler(path, handleChange, saveFormat),
-		[path, handleChange, saveFormat]
-	);
+    const getData = (data) => {
+      if (!data) {
+        return null;
+      }
+      const dayjsData = dayjs(data);
 
-	const value = getData(data, saveFormat);
-	const valueInInputFormat = value ? value.format(format) : "";
+      if (dayjsData.toString() === "Invalid Date") {
+        return null;
+      }
+      return dayjsData;
+    };
 
-	const handleKeyPressAmount = (e) => {
-		const allowedChars = /[0-9.,/]/;
-		const charCode = e.charCode;
-		const char = String.fromCharCode(charCode);
-		if (!allowedChars.test(char)) {
-			e.preventDefault();
-		}
-	};
+    const isValid = errors.length === 0;
+    const appliedUiSchemaOptions = merge({}, config, uischema.options);
+    const showDescription = !isDescriptionHidden(
+      visible,
+      description,
+      focused,
+      appliedUiSchemaOptions.showUnfocusedDescription
+    );
 
-	return (
-		<Box sx={{ width: "97%", margin: "2%" }}>
-			<Hidden xsUp={!visible}>
-				<LocalizationProvider dateAdapter={AdapterDayjs}>
-					<DatePicker
-						label={label}
-						value={value}
-						onChange={onChange}
-						inputFormat={format}
-						disableMaskedInput
-						views={views}
-						disabled={!enabled}
-						disableFuture
-						componentsProps={{
-							actionBar: {
-								actions: (variant) =>
-									variant === "desktop" ? [] : ["clear", "cancel", "accept"],
-							},
-						}}
-						renderInput={(params) => (
-							<ResettableTextField
-								{...params}
-								rawValue={data}
-								dayjsValueIsValid={value !== null}
-								valueInInputFormat={valueInInputFormat}
-								onKeyPress={handleKeyPressAmount}
-								focused={focused}
-								id={id + "-input"}
-								required={
-									required && !appliedUiSchemaOptions.hideRequiredAsterisk
-								}
-								autoFocus={appliedUiSchemaOptions.focus}
-								error={!isValid}
-								fullWidth={!appliedUiSchemaOptions.trim}
-								inputProps={{
-									...params.inputProps,
-									pattern: "[0-9]*",
-									inputMode: "numeric",
-									type: "text",
-								}}
-								InputLabelProps={data ? { shrink: true } : undefined}
-								onFocus={onFocus}
-								onBlur={onBlur}
-								variant={"standard"}
-							/>
-						)}
-					/>
-					<FormHelperText error={!isValid && !showDescription}>
-						{firstFormHelperText}
-					</FormHelperText>
-					<FormHelperText error={!isValid}>
-						{secondFormHelperText}
-					</FormHelperText>
-				</LocalizationProvider>
-			</Hidden>
-		</Box>
-	);
+    const format = appliedUiSchemaOptions.dateFormat ?? "YYYY-MM-DD";
+
+    const views = appliedUiSchemaOptions.views ?? ["year", "day"];
+
+    const firstFormHelperText = showDescription
+      ? description
+      : !isValid
+      ? errors
+      : null;
+    const secondFormHelperText = showDescription && !isValid ? errors : null;
+
+    const onChange = useMemo(() => {
+      if (type !== "create") {
+        return debounce(createOnChangeHandler(path, handleChange), 3000);
+      } else {
+        return createOnChangeHandler(path, handleChange);
+      }
+    }, [handleChange, path, type]);
+
+    const value = getData(data);
+    const valueInInputFormat = value ? value.format(format) : "";
+
+    const handleKeyPressAmount = (e) => {
+      const allowedChars = /[0-9/]/;
+      const charCode = e.charCode;
+      const char = String.fromCharCode(charCode);
+      if (!allowedChars.test(char)) {
+        e.preventDefault();
+      }
+    };
+
+    return (
+      <Box sx={{ width: "97%" }}>
+        <Hidden xsUp={!visible}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label={uischema.otherLabel}
+              value={value}
+              onChange={onChange}
+              inputFormat={format}
+              disableMaskedInput
+              views={views}
+              disabled={!enabled}
+              disableFuture
+              InputAdornmentProps={{
+                style: {
+                  marginRight: "16px",
+                },
+              }}
+              componentsProps={{
+                actionBar: {
+                  actions: (variant) =>
+                    variant === "desktop" ? [] : ["clear", "cancel", "accept"],
+                },
+              }}
+              renderInput={(params) => (
+                <ResettableTextField
+                  {...params}
+                  rawValue={data}
+                  dayjsValueIsValid={value !== null}
+                  valueInInputFormat={valueInInputFormat}
+                  onKeyPress={handleKeyPressAmount}
+                  focused={focused}
+                  id={id + "-input"}
+                  required={
+                    required && !appliedUiSchemaOptions.hideRequiredAsterisk
+                  }
+                  autoFocus={appliedUiSchemaOptions.focus}
+                  error={!isValid}
+                  fullWidth={!appliedUiSchemaOptions.trim}
+                  inputProps={{
+                    ...params.inputProps,
+                    pattern: "[0-9]*",
+                    inputMode: "numeric",
+                    type: "text",
+                  }}
+                  InputLabelProps={data ? { shrink: true } : undefined}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  variant={"standard"}
+                />
+              )}
+            />
+            <FormHelperText error={!isValid && !showDescription}>
+              {firstFormHelperText}
+            </FormHelperText>
+            <FormHelperText error={!isValid}>
+              {secondFormHelperText}
+            </FormHelperText>
+          </LocalizationProvider>
+        </Hidden>
+      </Box>
+    );
+  };
+  const MaterialDateProps = (props) => {
+    return (
+      <MaterialInputControl
+        {...props}
+        {...metaProps}
+        input={MaterialDateControl}
+      />
+    );
+  };
+
+  const tester = rankWith(5, isDateControl);
+  const renderer = withJsonFormsControlProps(MaterialDateProps);
+
+  const Renderer = { tester, renderer };
+  return Renderer;
 };
 
-const tester = rankWith(5, isDateControl);
-const renderer = withJsonFormsControlProps(MaterialDateControl);
-
-const Renderer = { tester, renderer };
-export default Renderer;
+export default EnrichmentDatePicker;

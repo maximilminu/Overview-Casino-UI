@@ -61,17 +61,20 @@ export default function CheckInView() {
   const [checkIn, setCheckIn] = useState(false);
 
   useEffect(() => {
-    if (member?.Name) {
-      Get(
-        `/visit/v1/status/?AreaID=6a523ecd-4b69-477c-ad29-8aee337ff05f&MemberID=${member.ID}`
-      ).then(({ data }) => {
-        const { AlreadyReported, Banned, UnderAge } = data;
-        if (AlreadyReported || UnderAge || Banned) {
-          setCheckIn(data);
-        } else {
-          setCheckIn(false);
+    if (member && member.ID) {
+      Get(`/visit/v1/status/?MemberID=${member.ID}&TestMode=false`).then(
+        ({ data }) => {
+          if (
+            data.Response.AlreadyReported ||
+            data.Response.UnderAge ||
+            data.Response.Banned
+          ) {
+            setCheckIn(data.Response);
+          } else {
+            setCheckIn(false);
+          }
         }
-      });
+      );
     }
     // eslint-disable-next-line
   }, [member]);

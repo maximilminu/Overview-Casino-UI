@@ -29,7 +29,6 @@ import {
 } from "react-router-dom";
 import Avatar from "../components/Avatar";
 import { useOutletContext } from "react-router-dom";
-import { HardwareContext } from "@oc/hardware-context";
 import { MemberContext } from "../context/MemberContext";
 
 const style = {
@@ -61,8 +60,8 @@ export default function MembersList() {
   const { onNavbarSearchListener } = useOutletContext();
   const [client, setClient] = useState({});
   const { Get } = useContext(ApiContext);
-  const [memberSearch, setMemberSearch] = useState();
-  const { param } = useParams();
+  const [memberSearch, setMemberSearch] = useState(false);
+  const { memberSearchText } = useParams();
   const navigate = useNavigate();
   const ifOutlet = useOutlet();
   const NotifyUser = useContext(NotifyUserContext);
@@ -73,66 +72,41 @@ export default function MembersList() {
     10,
     memberSearch
   );
-  const { setMember } = useContext(MemberContext)
-  const Hardware = useContext(HardwareContext);
+
+  const { setMember } = useContext(MemberContext);
 
   useEffect(() => {
-    if (param === "") {
+    if (ifOutlet) {
+      return;
+    }
+    let memberSearch;
+    if (memberSearchText === "") {
       navigate("/front-desk");
       return;
     }
 
-    if (location.pathname.match(`/${param}$`)) {
-      console.log('doGet by memberList param');
-      doGet(param);
+    if (location.pathname.includes("%20"))
+      memberSearch = location.pathname.slice(24);
+    if (
+      location.pathname.match(`/${memberSearchText}$`) ||
+      location.pathname.match(`/${memberSearch}$`)
+    ) {
+      doGet(memberSearchText);
     }
     // eslint-disable-next-line
-  }, [param]);
+  }, [memberSearchText, location]);
 
   useLayoutEffect(() => {
     return onNavbarSearchListener((data) => {
-      if (location.pathname.match(`/${param}$`)) {
-        console.log('doGet by memberList onNavvarSearchListener');
+      if (!ifOutlet && location.pathname.match(`/${memberSearchText}$`)) {
         doGet(data);
       }
     });
     // eslint-disable-next-line
   }, []);
 
-  useLayoutEffect(() => {
-    return Hardware.Device.BarcodeScanner.onDataListener((data) => {
-      console.log('memberyList BarcodeScanner onDataListener');
-      const dni = data.split("@");
-      try {
-        if (dni.length > 2) {
-          setClient({
-            Name: dni[2],
-            Lastname: dni[1],
-            LegalID: dni[4],
-            Birthdate: dni[6],
-          });
-        } else {
-          const reg = data.split("\r");
-          if (reg.length === 20) {
-            setClient({
-              Name: reg[3],
-              Lastname: reg[4],
-              LegalID: reg[1],
-              Birthdate: reg[5],
-              AreaReg8: reg[12],
-            });
-          }
-        }
-      } catch {
-        NotifyUser.Warning("No se pudo leer el documento.");
-      }
-    });
-    // eslint-disable-next-line
-  }, []);
-
   useEffect(() => {
-    if (client.LegalID) {
-      console.log('memberyList get client');
+    if (!ifOutlet && client.LegalID) {
       Get(`/member/v1/search/${client.LegalID}`)
         .then(({ data }) => {
           if (data.length === 0) {
@@ -165,7 +139,7 @@ export default function MembersList() {
   const doGet = (p) => {
     Get(`/member/v1/search/${p}`)
       .then(({ data }) => {
-        if (data?.length === 1) {
+        if (data?.length === 1 && memberSearch === false) {
           navigate(
             `/front-desk/member-list/${p}/view-single-member/${data[0].ID}`
           );
@@ -175,7 +149,7 @@ export default function MembersList() {
       })
       .catch(async (err) => {
         NotifyUser.Error(
-          `Problemas con la lista de miembros. Notifique al servicio técnicos (${err.request.status}).`
+          `Problemas con la lista de miembros. Notifique al servicio técnicos.`
         );
       });
   };
@@ -248,7 +222,6 @@ export default function MembersList() {
                       transition: "all .2s ease-in",
                     }}
                     onClick={() => {
-                      console.log("CURRENT MEMBER", currentMember);
                       handleClick(currentMember.ID);
                     }}
                   >
@@ -272,7 +245,7 @@ export default function MembersList() {
                       {currentMember.LegalID}
                     </TableCell>
                     <TableCell align="left" component="th" scope="row">
-                      {currentMember.Address.Area
+                      {currentMember.Address && currentMember.Area
                         ? capitalizer(currentMember.Address.Area)
                         : null}
                     </TableCell>

@@ -11,7 +11,8 @@ import { ApiContext } from "@oc/api-context";
 import { NotifyUserContext } from "@oc/notify-user-context";
 import Avatar from "../Avatar";
 import { useLayoutEffect } from "react";
-import { HardwareContext } from '@oc/hardware-context';
+import { HardwareContext } from "@oc/hardware-context";
+import { useEffect } from "react";
 
 const renderer = withJsonFormsDispatchCellProps(
   withJsonFormsLayoutProps(({ data, schema }) => {
@@ -27,20 +28,20 @@ const renderer = withJsonFormsDispatchCellProps(
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: "50px",
+        marginTop: "15px",
       },
       avatar: {
         color: "black",
-        width: 180,
+        width: 145,
         zIndex: -10000,
-        height: 180,
+        height: 145,
         margin: "0 auto",
       },
       fab: {
         position: "absolute",
         bottom: 0,
         zIndex: 100,
-        left: 65,
+        left: 45,
         color: "white",
         backgroundColor: "primary.main",
         "&:hover": {
@@ -48,6 +49,18 @@ const renderer = withJsonFormsDispatchCellProps(
         },
       },
     };
+
+
+
+    useEffect(() => {
+      if(Hardware.Device && Hardware.Device.Camera && Hardware.Device.Camera.status() === true){
+        console.log("Camera connected!")
+      } else {
+        NotifyUser.Error("Problemas comuncando con la cámara.")
+      }
+      // eslint-disable-next-line
+    }, [Hardware])
+    
 
     useLayoutEffect(() => {
       setTakingPicture(Boolean(data.ID) === false);
@@ -97,7 +110,6 @@ const renderer = withJsonFormsDispatchCellProps(
               const file = new File([blob], `avatar${data.Name}.jpg`, {
                 type: "image/jpeg",
               });
-              // console.log(file)
               fd.append("file", file);
               try {
                 Post(`/storage/avatar/${data.ID}`, fd)
@@ -150,7 +162,7 @@ const renderer = withJsonFormsDispatchCellProps(
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               width={320}
-              videoConstraints={Hardware.Device.Camera.videoConstraints}
+              videoConstraints={Hardware.Device && Hardware.Device.Camera && Hardware.Device.Camera.videoConstraints}
             />
           </Avatar>
 

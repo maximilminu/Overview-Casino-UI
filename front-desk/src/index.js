@@ -12,21 +12,21 @@ import MemberProvider from "./context/MemberContext";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <HardwareProvider>
-    <SnackbarProvider>
+  <SnackbarProvider>
       <NotifyUserProvider>
-        <ApiProvider>
-          <ConfigProvider>
-            <ThemeProvider>
-              <UserProvider>
-                <MemberProvider>
-                  <Router />
-                </MemberProvider>
-              </UserProvider>
-            </ThemeProvider>
-          </ConfigProvider>
-        </ApiProvider>
+        <HardwareProvider>
+          <ApiProvider>
+            <ConfigProvider>
+              <ThemeProvider>
+                <UserProvider>
+                  <MemberProvider>
+                    <Router />
+                  </MemberProvider>
+                </UserProvider>
+              </ThemeProvider>
+            </ConfigProvider>
+          </ApiProvider>
+        </HardwareProvider>
       </NotifyUserProvider>
     </SnackbarProvider>
-  </HardwareProvider>
 );

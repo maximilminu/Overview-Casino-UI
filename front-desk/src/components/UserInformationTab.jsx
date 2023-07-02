@@ -12,18 +12,20 @@ import {
   Fab,
   useTheme,
 } from "@mui/material";
+import dayjs from "dayjs";
 import Avatar from "./Avatar";
 import React, { useLayoutEffect, useState } from "react";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import EditIcon from "@mui/icons-material/Edit";
-import PlaceIcon from "@mui/icons-material/Place";
 import FingerprintOutlinedIcon from "@mui/icons-material/FingerprintOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CakeIcon from "@mui/icons-material/Cake";
-import ContactMailIcon from "@mui/icons-material/ContactMail";
 import InteractionChannelIcon from "./JsonForms/InteractionChannelIcon";
 import usePaginationContact from "../hook/usePaginationContact";
+import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
+import { useContext } from "react";
+import { ConfigContext } from "@oc/config-context";
 
 const style = {
   list: {
@@ -38,14 +40,16 @@ const style = {
   },
 };
 
-const UserInformationTab = ({ user, img }) => {
+const UserInformationTab = ({ user, img, isUnauthorize }) => {
   const theme = useTheme();
   const [nameLength, setNameLength] = useState(false);
+  const navigate = useNavigate();
   const [maxNameLength, setMaxNameLength] = useState(false);
   const { currentPage, nextPage, prevPage } = usePaginationContact(
     2,
     user?.ContactMethods
   );
+  const config = useContext(ConfigContext);
 
   useLayoutEffect(() => {
     if (
@@ -65,6 +69,10 @@ const UserInformationTab = ({ user, img }) => {
         return user.ContactMethods?.slice(0, 2);
       return user.ContactMethods?.slice(currentPage, currentPage + 2);
     }
+  };
+
+  const handleBirthday = () => {
+    return dayjs(user.Birthdate).format(config.DisplayFormats.Date);
   };
 
   const capitalizer = (word) => {
@@ -88,16 +96,76 @@ const UserInformationTab = ({ user, img }) => {
             justifyContent: "center",
             flexDirection: "column",
             alignItems: "center",
-            padding: "15px",
+            border:
+              isUnauthorize && isUnauthorize.Banned
+                ? `3px solid  ${theme.palette.error.dark}`
+                : isUnauthorize &&
+                  isUnauthorize.UnderAge &&
+                  `3px solid ${theme.palette.warning.dark}`,
           }}
         >
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent:
+                (isUnauthorize && isUnauthorize.Banned) ||
+                (isUnauthorize && isUnauthorize.UnderAge)
+                  ? "space-between"
+                  : "flex-end",
+            }}
+          >
+            {isUnauthorize && isUnauthorize.Banned && (
+              <Typography
+                sx={{
+                  fontSize: "10px",
+                  marginLeft: "5px",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  color: "grey",
+                }}
+              >
+                Suscripto al programa juego responsable
+              </Typography>
+            )}
+
+            {isUnauthorize && isUnauthorize.UnderAge && (
+              <Typography
+                sx={{
+                  fontSize: "10px",
+                  marginLeft: "5px",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  color: "grey",
+                }}
+              >
+                Menor de edad
+              </Typography>
+            )}
+            <Button
+              disabled={
+                (isUnauthorize && isUnauthorize.AlreadyReported) ||
+                (isUnauthorize && isUnauthorize.UnderAge) ||
+                (isUnauthorize && isUnauthorize.Banned)
+              }
+              sx={{ marginRight: "15px" }}
+              elevation={4}
+              onClick={() =>
+                navigate(`/front-desk/check-in/confirm/${user.ID}`)
+              }
+              variant="contained"
+            >
+              Check-in
+            </Button>
+          </Box>
           <Grid
             item
             sx={{
               width: "90%",
-              height: { xl: "15%", lg: "10%", md: "15%", xs: "20%" },
+              maxHeight: { xl: "15%", lg: "10%", md: "20%", xs: "20%" },
               display: "flex",
               alignItems: "center",
+              marginBottom: "5px",
             }}
           >
             <Grid
@@ -113,9 +181,9 @@ const UserInformationTab = ({ user, img }) => {
                 sx={{
                   marginLeft: "20px",
                   display: "flex",
-                  flexDirection: "row",
+                  flexDirection: maxNameLength ? "column" : "row",
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: maxNameLength ? "left" : "center",
                 }}
               >
                 <Typography
@@ -138,7 +206,7 @@ const UserInformationTab = ({ user, img }) => {
                       lg: nameLength ? "20px" : maxNameLength ? "18px" : "25px",
                       md: nameLength ? "15px" : maxNameLength ? "17px" : "20px",
                     },
-                    marginLeft: { xs: "5px", md: "5px" },
+                    marginLeft: !maxNameLength && { xs: "5px", md: "5px" },
                   }}
                 >
                   {capitalizer(user.Lastname)}
@@ -181,20 +249,9 @@ const UserInformationTab = ({ user, img }) => {
                 </ListItemAvatar>
                 <ListItemText
                   primary="Nacimiento:"
-                  secondary={user.Birthdate}
+                  secondary={handleBirthday()}
                 />
               </ListItem>
-              {user.Address.Area ? (
-                <ListItem sx={{ paddingY: "1px" }}>
-                  <ListItemAvatar>
-                    <PlaceIcon />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="Area:"
-                    secondary={capitalizer(user.Address.Area)}
-                  />
-                </ListItem>
-              ) : null}
               <ListSubheader
                 sx={{
                   lineHeight: "30px",
@@ -203,12 +260,18 @@ const UserInformationTab = ({ user, img }) => {
               >
                 Datos de Contacto:
               </ListSubheader>
-              <ListItem sx={{ paddingY: "1px" }}>
-                <ListItemAvatar>
-                  <ContactMailIcon />
-                </ListItemAvatar>
-                <ListItemText primary={"Email:"} secondary={user.Email} />
-              </ListItem>
+              {user && user.Email && (
+                <ListItem>
+                  <ListItemAvatar>
+                    <AlternateEmailIcon />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary="Correo Electrónico:"
+                    secondary={user.Email}
+                  />
+                </ListItem>
+              )}
+
               {(filteredCM() || []).map((cm, cmIdx) => (
                 <ListItem sx={{ paddingY: "1px" }} key={cmIdx}>
                   <ListItemAvatar>
@@ -276,6 +339,7 @@ const UserInformationTab = ({ user, img }) => {
                     "&:hover": {
                       backgroundColor: theme.palette.primary.dark,
                     },
+                    marginBottom: "5px",
                   }}
                 >
                   <EditIcon />

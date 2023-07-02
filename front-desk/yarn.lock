@@ -1983,10 +1983,10 @@
     "@oc/api-context" "^latest"
     react "^18.2.0"
 
-"@oc/hardware-context@^1.0.6":
-  version "1.0.6"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/hardware-context/-/@oc/hardware-context-1.0.6.tgz#6ac81aba74ae954876ce48bda2de1780ac5fc069"
-  integrity sha1-asgaunSulUh2zki9ot4XgKxfwGk=
+"@oc/hardware-context@^1.0.16":
+  version "1.0.16"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/hardware-context/-/@oc/hardware-context-1.0.16.tgz#a3bd21149601cc49f1b82b5c4697843f05efdf9f"
+  integrity sha1-o70hFJYBzEnxuCtcRpeEPwXv358=
   dependencies:
     escpos "^3.0.0-alpha.6"
     jsbarcode "^3.11.5"
@@ -1997,6 +1997,14 @@
   version "1.0.3"
   resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/notify-user-context/-/@oc/notify-user-context-1.0.3.tgz#5db6d5deee5a3ce67cee36372776911b761284c0"
   integrity sha1-XbbV3u5aPOZ87jY3J3aRG3YShMA=
+  dependencies:
+    notistack "^2.0.8"
+    react "^18.2.0"
+
+"@oc/notify-user-context@^1.0.5":
+  version "1.0.5"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/notify-user-context/-/@oc/notify-user-context-1.0.5.tgz#4550c5a4168700f1f481ca5358868122dc2152c9"
+  integrity sha1-RVDFpBaHAPH0gcpTWIaBItwhUsk=
   dependencies:
     notistack "^2.0.8"
     react "^18.2.0"

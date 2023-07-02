@@ -30,89 +30,27 @@
           "type": "Control",
           "label": "",
           "scope": "#/properties/LegalID",
-          "otherLabel": "DNI *"
+          "otherLabel": "Documento *",
+          "dni": "dni"
         },
         {
           "type": "Control",
-          "label": "Fecha de nacimiento *",
+          "label": "Padre",
+          "scope": "#/properties/Parent",
+          "options": {
+            "autocomplete" : true
+          }
+        },
+        {
+          "type": "Control",
+          "label": "",
+          "otherLabel": "Fecha de nacimiento *",
+          "focused": "true",
           "scope": "#/properties/Birthdate",
           "options": {
             "dateFormat": "DD/MM/YYYY",
             "format": "date"
           }
-        }
-      ]
-    },
-    {
-      "type": "HorizontalLayout",
-      "elements": [
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Email",
-          "otherLabel": "Email *"
-        },
-
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Line1",
-          "otherLabel": "Direccion *"
-        }
-      ]
-    },
-
-    {
-      "type": "HorizontalLayout",
-      "elements": [
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Line2",
-          "otherLabel": "Dirección 2 *"
-        },
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Zip",
-          "otherLabel": "Código Postal *"
-        }
-      ]
-    },
-
-    {
-      "type": "HorizontalLayout",
-      "elements": [
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Area",
-          "otherLabel": "Zona *"
-        },
-
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Location",
-          "otherLabel": "Ciudad *"
-        }
-      ]
-    },
-    {
-      "type": "HorizontalLayout",
-      "elements": [
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Region",
-          "otherLabel": "Provincia "
-        },
-
-        {
-          "type": "Control",
-          "label": "",
-          "scope": "#/properties/Country",
-          "otherLabel": "País "
         }
       ]
     },
@@ -125,6 +63,85 @@
           "scope": "#/properties/ContactMethods"
         }
       ]
+    },
+    {
+      "type": "VerticalLayout",
+      "elements": [
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "label": "",
+              "scope": "#/properties/Email",
+              "otherLabel": "Correo Electrónico",
+              "alphanumeric": "true"
+            },
+    
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Line1",
+              "label": "",
+              "otherLabel": "Dirección 1", 
+              "direction":"direction"
+            }
+          ]
+        },
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Line2",
+              "label": "",
+              "otherLabel": "Dirección 2",
+              "direction":"direction"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Zip",
+              "label": "",
+              "otherLabel": "Código Postal",
+              "direction":"direction"
+            }
+          ]
+        },
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Area",
+              "label": "",
+              "otherLabel": "Zona"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Location",
+              "label": "",
+              "otherLabel": "Ciudad"
+            }
+          ]
+        },
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Region",
+              "label": "",
+              "otherLabel": "Provincia"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/Address/properties/Country",
+              "label": "",
+              "otherLabel": "País"
+            }
+          ]
+        }
+      ]
     }
-  ]
+  ]  
 }

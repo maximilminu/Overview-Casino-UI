@@ -1,11 +1,10 @@
 import React, { useState, useContext, useLayoutEffect } from "react";
-import { Avatar, CircularProgress } from "@mui/material";
+import { Avatar, CircularProgress, Typography } from "@mui/material";
 import { ApiContext } from "@oc/api-context";
 
 const AvatarComponent = (props) => {
   const [picture, setPicture] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const { Get } = useContext(ApiContext);
 
   useLayoutEffect(() => {
@@ -37,20 +36,11 @@ const AvatarComponent = (props) => {
       {loading && (
         <CircularProgress sx={{ position: "absolute" }} color="grey" />
       )}
-      {(picture === false || loading) &&
-        props.subject?.Name &&
-        (props.subject.Name
-          ? props.subject.Name.slice(0, 1).toUpperCase()
-          : "") +
-          (props.subject.Lastname
-            ? props.subject.Lastname.slice(0, 1).toUpperCase()
-            : "")}
+      {props.counter > 1 && <Typography>{props.counter}</Typography>}
 
-      {(picture === false || loading) &&
-        props.subject?.FullName &&
-        (props.subject?.FullName
-          ? props.subject?.FullName.split(" ")[0].slice(0, 1)
-          : "")}
+      {(picture === false || loading) && props.subject && props.subject.FullName
+        ? props.subject?.FullName.split(" ")[0].slice(0, 1)
+        : ""}
 
       {props.children && props.children}
     </Avatar>

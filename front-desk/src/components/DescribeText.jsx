@@ -7,7 +7,6 @@ import { useContext } from "react";
 const DescribeText = (props) => {
   const { Get } = useContext(ApiContext);
   const [information, setInformation] = useState();
-
   useEffect(() => {
     Get(`/${props.preFixApi}/v1/describe/${props.ID}`).then(({ data }) => {
       const info = data.join(", ");
