@@ -6,11 +6,16 @@ import {
 	DialogContent,
 	TextField,
 	DialogActions,
+	Slide,
 } from "@mui/material";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+	return <Slide direction="up" ref={ref} {...props} />;
+});
 
 function MotiveModal({
 	title,
-	open,
+	openMotive,
 	onClose,
 	onChange,
 	onClick,
@@ -24,7 +29,11 @@ function MotiveModal({
 	};
 
 	return (
-		<Dialog open={open} onClose={onClose}>
+		<Dialog
+			open={openMotive}
+			onClose={onClose}
+			TransitionComponent={Transition}
+		>
 			<DialogTitle>{title || "Motivo"}</DialogTitle>
 			<DialogContent>
 				<TextField

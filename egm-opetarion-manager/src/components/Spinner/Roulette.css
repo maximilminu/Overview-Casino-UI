@@ -1,11 +1,7 @@
-.App {
-	font-family: sans-serif;
-	text-align: center;
+.container {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 100vh;
-	background-color: black;
 }
 
 .spinner {

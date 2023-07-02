@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import reportWebVitals from "./reportWebVitals";
-import { ThemeProvider } from "@oc/theme-context";
 
+import { ThemeProvider } from "@oc/theme-context";
+import { HardwareProvider } from "@oc/hardware-context";
 import { SnackbarProvider } from "notistack";
-import { EscPosPrinterProvider } from "@oc/escpos-printer-context";
 import { ApiProvider } from "@oc/api-context";
 import { ConfigProvider } from "@oc/config-context";
 import { NotifyUserProvider } from "@oc/notify-user-context";
@@ -20,7 +19,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
 	<>
 		<SnackbarProvider>
-			<EscPosPrinterProvider>
+			<HardwareProvider>
 				<ApiProvider>
 					<ConfigProvider>
 						<ThemeProvider>
@@ -39,12 +38,7 @@ root.render(
 						</ThemeProvider>
 					</ConfigProvider>
 				</ApiProvider>
-			</EscPosPrinterProvider>
+			</HardwareProvider>
 		</SnackbarProvider>
 	</>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

@@ -15,7 +15,7 @@ import Roulette from "../components/Spinner/Roulette";
 import { TicketDataCOntext } from "../context/TicketData";
 import { ApiContext } from "@oc/api-context";
 import { NotifyUserContext } from "@oc/notify-user-context";
-import { Outlet, useNavigate, useOutlet } from "react-router";
+import { Outlet, useLocation, useNavigate, useOutlet } from "react-router";
 import PaidIcon from "@mui/icons-material/Paid";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import NumbersIcon from "@mui/icons-material/Numbers";
@@ -34,11 +34,20 @@ const Home = () => {
 	const NotifyUser = useContext(NotifyUserContext);
 	const { Get } = useContext(ApiContext);
 	const [loading, setLoading] = useState(false);
-
+	const location = useLocation();
 	const navigate = useNavigate();
 	const [machineNumber, setMachineNumber] = useState("");
 	const [loadingApi, setLoadingApi] = useState(false);
 	const [dateTime, setDateTime] = useState(dayjs(Date.now()));
+
+	useEffect(() => {
+		console.log(location);
+		if (location.pathname === "/egm-operation-manager/ticket-validate") {
+			setData({});
+			setMachineNumber("");
+			setDateTime();
+		}
+	}, [location]);
 
 	// Cases: Notes - Barcode
 	const handleChange = (e) => {
@@ -49,7 +58,12 @@ const Home = () => {
 		e.preventDefault();
 
 		const { value } = e.target;
-		const newValue = value.replace(/,/g, ".");
+		const newValue =
+			// busca la coma en el valor value y la reemplaza por un punto.
+			value
+				.replace(",", ".")
+				//expresión regular para buscar puntos adicionales que puedan existir después del primer punto y los borra
+				.replace(/\.(?=\d*\.)/g, "");
 
 		setData({ ...data, [e.target.id]: newValue });
 	};
@@ -99,12 +113,16 @@ const Home = () => {
 
 	const getTicket = () => {
 		Get(
-			`/ticket/v1/search/?PrintedIn=${data.PrintedIn}&Barcode=${data.Barcode}&Amount=${data.Amount}&Date=${data?.Date}`
+			`/ticket/v1/search/?PrintedIn=${encodeURIComponent(
+				data.PrintedIn
+			)}&Barcode=${encodeURIComponent(
+				data.Barcode
+			)}&Amount=${encodeURIComponent(data.Amount)}&Date=${encodeURIComponent(
+				data?.Date
+			)}`
 		)
 			.then(({ data }) => {
-				if (data[0].Status === 10) {
-					NotifyUser.Warning("Este ticket ya fue reemplazado por muleto");
-				} else if (data.length !== 0) {
+				if (data.length !== 0 && data[0].Status === 0) {
 					setLoading(true);
 					setTicket(data[0]);
 
@@ -112,10 +130,20 @@ const Home = () => {
 						navigate("ticket-print");
 						setLoading(false);
 					}, 2000);
+				} else if (data[0].Status === 10) {
+					NotifyUser.Warning("Este ticket ya fue reemplazado por muleto");
+				} else if (data[0].Status === 13) {
+					NotifyUser.Warning(
+						"Ese ticket ya se encuentra pendiente de autorización"
+					);
 				} else NotifyUser.Error("No se pudo encontrar el ticket.");
 			})
 			.catch((err) => {
+				console.log("error", err);
 				NotifyUser.Error("No se pudo encontrar el ticket.");
+				NotifyUser.Error(
+					`Problemas con el servicio de verificación de ticket. Notifique al servicio técnico (${err.response.status}).`
+				);
 			});
 	};
 
@@ -184,7 +212,11 @@ const Home = () => {
 								clearOnBlur={true}
 								includeInputInList
 								autoHighlight
-								noOptionsText="Comience a escribir para buscar "
+								noOptionsText={
+									data?.PrintedIn?.length >= 4
+										? "No se encontraron resultados"
+										: "Comience a escribir para buscar"
+								}
 								sx={{ margin: ".5rem", width: "45%" }}
 								value={machineNumber}
 								onChange={(e, newValue) => {
@@ -244,14 +276,6 @@ const Home = () => {
 								sx={{
 									margin: ".5rem",
 									width: "45%",
-									'input[type="number"]::-webkit-inner-spin-button': {
-										WebkitAppearance: "none",
-										margin: 0,
-									},
-									'input[type="number"]::-webkit-outer-spin-button': {
-										WebkitAppearance: "none",
-										margin: 0,
-									},
 								}}
 								InputProps={{
 									endAdornment: (

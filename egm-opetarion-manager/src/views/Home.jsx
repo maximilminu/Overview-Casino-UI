@@ -1,11 +1,21 @@
 import { Box } from "@mui/material";
-import React from "react";
+import React, { useLayoutEffect, useContext } from "react";
 import { Outlet, useMatches } from "react-router";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-
+import { HardwareContext } from "@oc/hardware-context";
 const Home = () => {
+	const Hardware = useContext(HardwareContext);
 	const matches = useMatches();
+	useLayoutEffect(() => {
+		Hardware.ConnectAll()
+			.then((ret) => {
+				console.log("Devices initialized:", ret);
+			})
+			.catch((err) => {
+				console.log("Problems connecting devices:", err);
+			});
+	}, [Hardware]);
 	return (
 		<>
 			<Navbar />
