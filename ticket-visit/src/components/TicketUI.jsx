@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Paper, Typography, Box, Container } from "@mui/material";
 
-import logo from "./assets/loguis.png";
+import Logo from "./assets/Logo.png";
 
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import Checkmark from "./assets/Checkmark";
 
 const style = {
 	container: {
@@ -29,8 +29,8 @@ const style = {
 	paperTicket: {
 		backgroundColor: "white",
 		color: "black",
-		width: { xs: "20rem", md: "33rem" },
-		height: { xs: "25rem", md: "unset" },
+		width: { xs: "18rem", md: "30rem" },
+		height: { xs: "22.5rem", md: "unset" },
 		position: "relative",
 		marginLeft: "auto",
 		marginRight: "auto",
@@ -40,7 +40,8 @@ const style = {
 	},
 };
 
-const TicketUi = ({ ID, Name, Area, CreatedAt, PrintedAt }) => {
+const TicketUi = ({ Name, Area, PrintedAt }) => {
+	const [capitalizedName, setCapitalizedName] = useState();
 	function convertirFecha(milisegundos) {
 		const fecha = new Date(milisegundos);
 		const opciones = {
@@ -52,19 +53,32 @@ const TicketUi = ({ ID, Name, Area, CreatedAt, PrintedAt }) => {
 			second: "numeric",
 			hour12: false,
 		};
-		return fecha.toLocaleString("es-ES", opciones);
+
+		return `${fecha.toLocaleString("es-ES", opciones)} `;
 	}
+
+	useEffect(() => {
+		const toTitleCase = (str) => {
+			if (!str) return ""; // <-- agregamos una comprobación aquí
+			return str.replace(/\b\w+/g, function (word) {
+				return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+			});
+		};
+		const capitalizedName = toTitleCase(Name);
+		setCapitalizedName(capitalizedName);
+	}, [Name]);
+
 	const date = convertirFecha(PrintedAt);
 	return (
 		<Container sx={style.container}>
-			<Box sx={{ marginTop: "2rem" }}>
+			<Box sx={{ marginTop: "4em" }}>
 				<Box
 					component="img"
-					src={logo}
+					src={Logo}
 					sx={{
 						objectFit: "fill",
-						width: { xs: "350px", md: "400px" },
-						height: { xs: "170px", md: "200px" },
+						width: { xs: "300px", md: "400px" },
+						height: { xs: "150px", md: "200px" },
 						marginBottom: "4rem",
 					}}
 				/>
@@ -92,12 +106,12 @@ const TicketUi = ({ ID, Name, Area, CreatedAt, PrintedAt }) => {
 									}}
 									variant="h4"
 								>
-									Check-in de {Name}
+									Check-in de
 									{<br />}
+									{capitalizedName}
 								</Typography>
 							</Grid>
 							<Grid item>
-								{" "}
 								{<br />}
 								<Typography sx={{ fontSize: { xs: "1.5rem", md: "1.8rem" } }}>
 									En {Area}
@@ -109,16 +123,13 @@ const TicketUi = ({ ID, Name, Area, CreatedAt, PrintedAt }) => {
 									variant="h3"
 									sx={{ fontSize: { xs: "1.2rem", md: "1.5rem" } }}
 								>
-									{" "}
 									{date}
 								</Typography>
 							</Grid>
 							<Grid item>
 								{<br />}
-								{/* <Box variant="h3" sx={{ width: "5rem", height: "10rem" }}> */}{" "}
-								<TaskAltIcon
-									sx={{ width: "8rem", height: "8rem", color: "#a944d2df" }}
-								/>
+								{/* <Box variant="h3" sx={{ width: "5rem", height: "10rem" }}> */}
+								<Checkmark />
 								{/* </Box> */}
 							</Grid>
 

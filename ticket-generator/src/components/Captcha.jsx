@@ -18,9 +18,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
   const [clickedNumberButtom, setClickedNumberButtom] = useState();
 
   useEffect(() => {
-    setRandomNumber(Math.floor(Math.random() * 36) + 1);
+    setRandomNumber(Math.floor(Math.random() * (36 - 1 + 1) + 1));
     // eslint-disable-next-line
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (open && progress > 0) {
@@ -63,22 +63,43 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
         }}
         aria-labelledby="alert-dialog-title"
       >
-        <Typography
-          variant="h3"
+        <Box
           sx={{
-            fontFamily: "Apple Color Emoji",
-            textAlign: "center",
-            fontWeight: "700",
-            fontSize: "25px",
-            color: "white",
-            fontStyle: "italic",
             background:
               "radial-gradient(circle, rgba(24,97,49,1) 43%, rgba(43,57,45,1) 100%)",
-            padding: "15px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          {title} {randomNumber}
-        </Typography>
+          <Typography
+            variant="h3"
+            sx={{
+              fontFamily: "Apple Color Emoji",
+              textAlign: "left",
+              fontWeight: "700",
+              fontSize: "25px",
+              color: "white",
+              fontStyle: "italic",
+              padding: "15px",
+            }}
+          >
+            {title}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: "Apple Color Emoji",
+              textAlign: "right",
+              fontWeight: "700",
+              fontSize: "40px",
+              color: "white",
+              fontStyle: "italic",
+            }}
+          >
+            {randomNumber}
+          </Typography>
+        </Box>
         <Box
           sx={{
             margin: " 0 auto",
@@ -625,9 +646,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -643,9 +664,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="73.159187"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -661,9 +682,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 y="100.21909"
@@ -681,9 +702,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -699,9 +720,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="100.21909"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -717,9 +738,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="126.07173"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -735,9 +756,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 y="126.07173"
@@ -754,9 +775,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="126.07173"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -773,9 +794,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -791,9 +812,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="152.15352"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -810,9 +831,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -829,9 +850,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -847,9 +868,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="179.20003"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -866,9 +887,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -884,9 +905,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="205.2829"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -902,9 +923,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="205.2829"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -921,9 +942,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -940,9 +961,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -959,9 +980,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -977,9 +998,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="231.67793"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -996,9 +1017,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1015,9 +1036,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1033,9 +1054,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="257.76077"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1051,9 +1072,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="284.58948"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1070,9 +1091,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1088,9 +1109,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="284.58948"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1106,9 +1127,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="310.67236"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1123,9 +1144,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 x="-61.84861"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 y="310.67236"
@@ -1143,9 +1164,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1162,9 +1183,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1179,9 +1200,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 x="-94.789955"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 y="336.63101"
@@ -1199,9 +1220,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1217,9 +1238,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="362.71283"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1235,9 +1256,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 y="362.71283"
                 style={{
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1254,9 +1275,9 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
                 style={{
                   fill: "white",
                   cursor: "default",
-                  webkitUserSelect: "none",
-                  mozUserSelect: "none",
-                  msUserSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  MsUserSelect: "none",
                   userSelect: "none",
                 }}
                 onClick={(e) => {
@@ -1277,7 +1298,12 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
               marginBottom: "5px",
               marginRight: "5px",
             }}
-            onClick={onCancel}
+            onClick={() => {
+              onCancel();
+              setTimeout(() => {
+                setRandomNumber(Math.floor(Math.random() * 36) + 1);
+              }, 500);
+            }}
           >
             Cancelar
           </Button>
@@ -1318,7 +1344,7 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
             }}
             id="alert-dialog-title"
           >
-            Clickeaste mal el número indicado
+            EL NÚMERO SELECCIONADO NO COINCIDE
           </DialogTitle>
         </Box>
         <DialogContent>
@@ -1331,8 +1357,8 @@ const Captcha = ({ title, onContinue, open, onCancel }) => {
             }}
             id="alert-dialog-description"
           >
-            Por favor prestá atención, para poder autorizar el ticket tenes que
-            seleccionar el número correcto.
+            Para autorizar, seleccione el número en el paño que coincida con el
+            propuesto.
           </DialogContentText>
           <Box sx={{ width: "100%" }}>
             <LinearProgress

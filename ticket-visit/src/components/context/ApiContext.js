@@ -93,7 +93,7 @@ export const ApiProvider = ({ children }) => {
 							return;
 						case 401:
 							console.error(
-								"Se venció la seción o la autenticación es inválida."
+								"Se venció la sesión o la autenticación es inválida."
 							);
 
 							return;

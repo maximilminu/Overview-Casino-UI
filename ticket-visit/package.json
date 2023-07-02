@@ -10,7 +10,7 @@
     "@mui/lab": "^5.0.0-alpha.100",
     "@mui/material": "^5.10.6",
     "@mui/system": "^5.10.6",
-    "@oc/notify-user-context": "^1.0.3",
+    "@oc/notify-user-context": "^1.0.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
