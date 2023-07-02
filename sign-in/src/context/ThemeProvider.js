@@ -15,12 +15,27 @@ const ThemeProvider = ({ children }) => {
     // eslint-disable-next-line
   }, []);
 
+  
   return (
     <ThemeContext.Provider value="">
       {theme && (
         <MuiThemeProvider theme={theme}>
-          {children}
           <CssBaseline />
+            <Box
+            sx={{
+              position: "fixed",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              overflow: "hidden",
+              background: theme.palette.backgroundColor.main,
+              
+            }}
+            component="main"
+          >
+          {children}
+          </Box>
           {packageJson.version.includes("rc") && (
             <Box
               sx={{

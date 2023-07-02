@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import SignIn from "./SignIn";
+import Router from "./Router";
 import ThemeProvider from "./context/ThemeProvider";
 import { BrowserRouter } from "react-router-dom";
 import ConfigProvider from "./context/ConfigProvider";
@@ -11,7 +11,7 @@ root.render(
   <ConfigProvider>
     <ThemeProvider>
       <BrowserRouter>
-        <SignIn />
+        <Router />
       </BrowserRouter>
     </ThemeProvider>
   </ConfigProvider>

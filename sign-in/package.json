@@ -1,6 +1,6 @@
 {
   "name": "sign-in",
-  "version": "0.1.0-rc",
+  "version": "1.0.23",
   "homepage": "/sign-in",
   "private": true,
   "dependencies": {
@@ -12,9 +12,6 @@
     "@mui/lab": "^5.0.0-alpha.107",
     "@mui/material": "^5.10.13",
     "@mui/styled-engine-sc": "^5.10.6",
-    "@oc/config-signin": "^1.0.3",
-    "@oc/notify-user-context": "^1.0.3",
-    "@oc/theme-signin": "^1.0.4",
     "axios": "^1.2.0",
     "jwt-decode": "^3.1.2",
     "react": "^18.2.0",

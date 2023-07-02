@@ -14,7 +14,7 @@ const ImageCrupier = () => {
   return (
     <Box
       component="img"
-      sx={{ height: "130px", width: "140px" }}
+      sx={{ height: {xl:"180px", xs:"130px"}, width: {xl:"200px", xs: "140px"} }}
       src={CroupierImages[randomNumber]}
     />
   );

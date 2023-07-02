@@ -1778,53 +1778,22 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@oc/barcode-reader-context@^1.0.1":
-  version "1.0.1"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/barcode-reader-context/-/@oc/barcode-reader-context-1.0.1.tgz#efcf322ee3d091d58dc5ce20a35780433c57208e"
-  integrity sha1-788yLuPQkdWNxc4go1eAQzxXII4=
+"@oc/hardware-context@^1.0.10":
+  version "1.0.10"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/hardware-context/-/@oc/hardware-context-1.0.10.tgz#6cffd1c700f58471a199ff693b382800891e672d"
+  integrity sha1-bP/RxwD1hHGhmf9pOzgoAIkeZy0=
   dependencies:
-    react "^18.2.0"
-
-"@oc/camera-context@^1.0.2":
-  version "1.0.2"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/camera-context/-/@oc/camera-context-1.0.2.tgz#efd4447e6ea000e16f4f4f08d99cd6fec2175129"
-  integrity sha1-79REfm6gAOFvT08I2ZzW/sIXUSk=
-  dependencies:
-    react "^18.2.0"
-    react-use-localstorage "^3.5.3"
-
-"@oc/escpos-printer-context@^1.0.1":
-  version "1.0.1"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/escpos-printer-context/-/@oc/escpos-printer-context-1.0.1.tgz#ea4d800b327414c9abfb40715adc0cbdc2dd86b1"
-  integrity sha1-6k2ACzJ0FMmr+0BxWtwMvcLdhrE=
-  dependencies:
-    browserify-zlib "^0.2.0"
-    buffer "^6.0.3"
     escpos "^3.0.0-alpha.6"
-    http-browserify "^1.7.0"
-    https-browserify "^1.0.0"
-    os-browserify "^0.3.0"
-    path-browserify "^1.0.1"
+    jsbarcode "^3.11.5"
+    ndarray "^1.0.19"
     qrcode "^1.5.1"
-    react "^18.2.0"
-    stream-browserify "^3.0.0"
-    stream-http "^3.2.0"
-    url "^0.11.0"
-    util "^0.12.5"
 
-"@oc/notify-user-context@^1.0.1":
-  version "1.0.1"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/notify-user-context/-/@oc/notify-user-context-1.0.1.tgz#463839ed91c8a624377a47394c6e3908b39d4644"
-  integrity sha1-Rjg57ZHIpiQ3ekc5TG45CLOdRkQ=
+"@oc/notify-user-context@^1.0.3":
+  version "1.0.3"
+  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/notify-user-context/-/@oc/notify-user-context-1.0.3.tgz#5db6d5deee5a3ce67cee36372776911b761284c0"
+  integrity sha1-XbbV3u5aPOZ87jY3J3aRG3YShMA=
   dependencies:
     notistack "^2.0.8"
-    react "^18.2.0"
-
-"@oc/rfld-reader-context@^1.0.1":
-  version "1.0.1"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/rfld-reader-context/-/@oc/rfld-reader-context-1.0.1.tgz#b2d064d00947a96c4bc66f4d0a4a49916bc19cb3"
-  integrity sha1-stBk0AlHqWxLxm9NCkpJkWvBnLM=
-  dependencies:
     react "^18.2.0"
 
 "@oc/secure-browser-context@^1.0.1":
@@ -1832,14 +1801,6 @@
   resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/secure-browser-context/-/@oc/secure-browser-context-1.0.1.tgz#26994083cebdac39af147cb47fc6957027dc1e11"
   integrity sha1-JplAg869rDmvFHy0f8aVcCfcHhE=
   dependencies:
-    react "^18.2.0"
-
-"@oc/tcl-printer-context@^1.0.1":
-  version "1.0.1"
-  resolved "https://gitlab.sistematis.com.ar/api/v4/projects/219/packages/npm/@oc/tcl-printer-context/-/@oc/tcl-printer-context-1.0.1.tgz#76c3e6553e87fe3090084366aba8d2a4063b860b"
-  integrity sha1-dsPmVT6H/jCQCENmq6jSpAY7hgs=
-  dependencies:
-    dayjs "^1.11.7"
     react "^18.2.0"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.3":
@@ -6523,6 +6484,11 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
+jsbarcode@^3.11.5:
+  version "3.11.5"
+  resolved "https://registry.yarnpkg.com/jsbarcode/-/jsbarcode-3.11.5.tgz#390b3efd0271f35b9d68c7b8af6e972445969014"
+  integrity sha512-zv3KsH51zD00I/LrFzFSM6dst7rDn0vIMzaiZFL7qusTjPZiPtxg3zxetp0RR7obmjTw4f6NyGgbdkBCgZUIrA==
+
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
@@ -6996,7 +6962,7 @@ ndarray-pack@^1.1.1:
     cwise-compiler "^1.1.2"
     ndarray "^1.0.13"
 
-ndarray@^1.0.13:
+ndarray@^1.0.13, ndarray@^1.0.19:
   version "1.0.19"
   resolved "https://registry.yarnpkg.com/ndarray/-/ndarray-1.0.19.tgz#6785b5f5dfa58b83e31ae5b2a058cfd1ab3f694e"
   integrity sha512-B4JHA4vdyZU30ELBw3g7/p9bZupyew5a7tX1Y/gGeF2hafrPaQZhgrGQfsvgfYbgdFZjYwuEcnaobeM/WMW+HQ==

@@ -1,24 +1,19 @@
 import {
   Container,
-  Grid,
   Typography,
   Box,
-  FormControl,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
+  LinearProgress,
 } from "@mui/material";
-import TclPrinterButton from "./components/TclPrinterButton";
-import EscPosPrinterButton from "./components/EscPosPrinterButton";
-import CameraButton from "./components/CameraButton";
-import RfIdButton from "./components/RfIdButton";
-import BarcodeReaderButton from "./components/BarcodeReaderButton";
-import { useContext, useLayoutEffect, useState } from "react";
-import { SecureBrowserContext } from "@oc/secure-browser-context";
+import HardwareButton from "@oc/hardware-context/dist/Button";
+import { useContext, useEffect, useRef, useState } from "react";
+import { HardwareContext } from "@oc/hardware-context";
 import Table from "@mui/material/Table";
+import Webcam from "react-webcam";
 import {
   TableContainer,
   TableBody,
@@ -28,264 +23,456 @@ import {
   TableRow,
   Paper,
   Button,
-  TextField,
 } from "@mui/material";
-import { CameraContext } from "@oc/camera-context";
-import DoDisturbIcon from "@mui/icons-material/DoDisturb";
-import {
-  BarcodeReaderContext,
-  READER_STATUS_OFFLINE,
-} from "./context/BarcodeReaderContext";
-import { EscPosPrinterContext } from "./context/EscPosPrinterContext";
-import { TclPrinterContext } from "./context/TclPrinterContext";
+import { ApiContext } from "./context/ApiContext";
+
 function Main() {
-  const { TclPrinter } = useContext(TclPrinterContext);
   const [barcodeReaderDemo, setBarcodeReaderDemo] = useState(false);
-  const { BarcodeReader } = useContext(BarcodeReaderContext);
-  const { Printer } = useContext(EscPosPrinterContext);
-  const SecureBrowser = useContext(SecureBrowserContext);
-  const [peripheralsConfigs, setPeripheralsConfigs] = useState(
-    SecureBrowser.Configs.Peripherals
-  );
-
-  const handleCheckboxClick = (device, peripheral) => {
-    console.log(peripheral, "peripheral");
-    console.log(device, "device");
-    const port = peripheral.ID.split(":");
-    const filter = {
-      vendorId: Number(`0x${port[1]}`),
-      productId: Number(`0x${port[2]}`),
-    };
-
-    if (peripheral.ID === "") {
-      device.Context.disconnect();
+  const Hardware = useContext(HardwareContext);
+  const [checkboxChecked, setCheckboxChecked] = useState({});
+  const [deviceStatus, setDeviceStatus] = useState({});
+  const [iconIsDisabled, setIconIsDisabled] = useState({});
+  const [scannerDemoData, setScannerDemoData] = useState("");
+  const listenersRef = useRef({});
+  const [currentCameraConstraints, setCurrentCameraConstraints] =
+    useState(false);
+  const [cameraDemoOpen, setCameraDemoOpen] = useState(false);
+  const { Post, Loading, Delete } = useContext(ApiContext);
+  const [inicializate, setInicializate] = useState(false);
+  const handleCheckboxClick = ({ peripheralID, driverName }) => {
+    if (peripheralID === checkboxChecked[driverName]) {
+      return;
     }
-    if (peripheral.ID !== "" && device.Name === "Scanner") {
-      BarcodeReader.connect(filter);
+    const hw = Hardware.Device[driverName];
+    if (!hw && !hw.Driver) {
+      return;
     }
+    setIconIsDisabled((p) => ({ ...p, [driverName]: peripheralID === "" }));
+    if (peripheralID !== "") {
+      const filter = {
+        vendorId: Number(`0x${peripheralID.split(":")[1]}`),
+        productId: Number(`0x${peripheralID.split(":")[2]}`),
+      };
 
-    device.Name === "EscPos" && Printer.connect(filter);
-    device.Name === "Tcl" && TclPrinter.connect(filter);
+      hw.connect(filter)
+        .then(() => {
+          setDeviceStatus((p) => ({ ...p, [driverName]: hw.status() }));
+          hw.statusChangedListener(() => {
+            setDeviceStatus((p) => ({
+              ...p,
+              [driverName]: hw.status(),
+            }));
+          });
 
-    const p = { ...peripheralsConfigs };
-    Object.keys(p).forEach((key) => {
-      p[key] === peripheral.ID && delete p[key];
-    });
-    p[device.Name] = peripheral.ID;
-    setPeripheralsConfigs(p);
+          if (hw.onDataListener) {
+            listenersRef[driverName] = hw.onDataListener((data) => {
+              setScannerDemoData(data);
+            });
+          }
+        })
+        .catch((e) => {
+          setCheckboxChecked((p) => ({ ...p, [driverName]: "" }));
+        });
+    }
+    if (!hw.status()) {
+      hw.disconnect();
+    } else {
+      if (listenersRef[driverName]) {
+        listenersRef[driverName]();
+      }
+      hw.disconnect();
+    }
+    setCheckboxChecked((p) => ({ ...p, [driverName]: peripheralID }));
+  };
+
+  const handleInformationDB = ({ peripheralID, driverName }) => {
+    if (peripheralID === "") {
+      Delete(`/hw/v1/delete-peripherals/${driverName}`).then((res) =>
+        console.log(res)
+      );
+    } else {
+      Post(`/hw/v1/peripherals/`, {
+        [driverName]: {
+          Filter: {
+            vendorId: `0x${peripheralID.split(":")[1]}`,
+            productId: `0x${peripheralID.split(":")[2]}`,
+          },
+        },
+      }).then((res) => console.log(res));
+    }
   };
 
   const Peripherals = [
-    { ID: "", Name: "Sin uso" },
-    ...SecureBrowser.Info.Properties.Peripherals,
+    { ID: "", Name: "No configurado" },
+    ...Hardware.Info.Properties.Peripherals,
   ];
 
-  const DevicesLabel = [
-    {
-      Name: "Camera",
-      Icon: <CameraButton />,
-      Description: "Camara de fotos",
-      Context: TclPrinter,
-    },
-    {
-      Name: "Scanner",
-      Icon: <BarcodeReaderButton />,
-      Description: "Scanner Código de barras 2D",
-      Context: BarcodeReader,
-    },
-    {
-      Name: "EscPos",
-      Icon: <EscPosPrinterButton />,
-      Description: "Impresora de papel continuo",
-      Context: Printer,
-    },
-    {
-      Name: "Tcl",
-      Icon: <TclPrinterButton />,
-      Description: "Impresora de EGM (GEN2)",
-      Context: TclPrinter,
-    },
-    // {
-    //   Name: "Sin uso",
-    //   Icon: <DoDisturbIcon sx={{ paddingTop: "20px" }} />,
-    //   Description: "Dispositivo sin uso",
-    // },
-  ];
+  useEffect(() => {
+    if (inicializate) {
+      let filters = {};
+      let data;
+      if (Peripherals && Hardware.Configs.Peripherals) {
+        // eslint-disable-next-line
+        Peripherals.map((peripheral) => {
+          // eslint-disable-next-line
+          Object.keys(Hardware.Configs.Peripherals).map((device) => {
+            if (Hardware.Configs.Peripherals[device].Filter) {
+              if (device === "BarcodeScanner") {
+                data = `serial:${Hardware.Configs.Peripherals[
+                  device
+                ].Filter.vendorId.substring(2)}:${Hardware.Configs.Peripherals[
+                  device
+                ].Filter.productId.substring(2)}`;
+              } else {
+                data = `usb:${Hardware.Configs.Peripherals[
+                  device
+                ].Filter.vendorId.substring(2)}:${Hardware.Configs.Peripherals[
+                  device
+                ].Filter.productId.substring(2)}`;
+              }
+              if (data === peripheral.ID) {
+                filters = { ...filters, [device]: peripheral.ID };
+              }
+            }
+          });
+        });
+      }
+      // eslint-disable-next-line
+      Object.keys(filters).map((filtro) => {
+        setCheckboxChecked((p) => ({ ...p, [filtro]: filters[filtro] }));
+        handleCheckboxClick({
+          peripheralID: filters[filtro],
+          driverName: filtro,
+        });
+      });
 
-  const handleScannerButton = () => {
-    BarcodeReader.status !== READER_STATUS_OFFLINE &&
-      setBarcodeReaderDemo(true);
+      Object.keys(Hardware.Configs.Peripherals)
+        .filter((p) => Object.keys(filters).indexOf(p) < 0)
+        .forEach((filtro) => {
+          iconIsDisabled[filtro] = true;
+          handleCheckboxClick({ peripheralID: "", driverName: filtro });
+        });
+    }
+    // eslint-disable-next-line
+  }, [Hardware.Device, inicializate]);
+
+  const handleExitConfigMode = () => {
+    Post("/hw/v1/exit-config-mode").then((res) => {
+      window.close();
+    });
   };
 
   return (
-    <>
-      <Container component={Paper} sx={{ width: "90%", marginTop: "50px" }}>
-        <Box
-          sx={{
-            display: "flex",
-            width: "100%",
-            justifyContent: "center",
-            padding: "15px",
-          }}
-        >
-          <Typography variant="h6">
-            Configuración de la terminal de trabajo
-          </Typography>
-        </Box>
-
-        <TableContainer sx={{ width: "100%" }}>
-          <Table size="small">
-            <TableHead>
-              <TableCell>Devices</TableCell>
-              {DevicesLabel.map((device) => (
-                <TableCell sx={{ textAlign: "center" }}>
-                  <Typography xs={{ fontSize: "1" }}>
-                    {device.Description}
-                  </Typography>
-                  <IconButton
-                    onClick={() => {
-                      device.Name === "Scanner" && handleScannerButton();
-                    }}
-                    sx={{ color: "black" }}
-                  >
-                    {device.Icon}
-                  </IconButton>
-                </TableCell>
-              ))}
-            </TableHead>
-            <TableBody>
-              {Peripherals.map((peripheral) => (
-                <TableRow key={peripheral.ID}>
-                  <TableCell
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      fontSize: "10px",
-                      lineHeight: "1px",
-                      width: "250px !important",
-                    }}
-                  >
-                    <Typography>{peripheral.Name || peripheral.ID}</Typography>
-                    <Typography>{peripheral.Manufacturer}</Typography>
-                    <Typography>{peripheral.Product}</Typography>
-                  </TableCell>
-                  {DevicesLabel.map((device) => (
-                    <TableCell align="center" key={device.Name}>
-                      <Checkbox
-                        color="primary"
-                        checked={
-                          peripheralsConfigs[device.Name] === peripheral.ID
-                        }
-                        onClick={() => {
-                          handleCheckboxClick(device, peripheral);
-                        }}
-                      />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <FormControl sx={{ display: "flex", flexDirection: "row" }}>
-            <Box
-              sx={{
-                width: "80%",
-                display: "flex",
-                padding: "10px",
-                flexDirection: "column",
-              }}
-            >
-              <TextField
-                id="outlined-basic"
-                label="Nombre de la terminal"
-                variant="standard"
-              />
-            </Box>
-            <Box
-              sx={{
-                width: "40%",
-                display: "flex",
-                justifyContent: "center",
-                padding: "21px",
-              }}
-            >
-              <Button color="success" variant="contained">
-                Guardar
-              </Button>
-            </Box>
-          </FormControl>
-        </TableContainer>
-      </Container>
-
-      <Dialog
-        open={barcodeReaderDemo}
-        onClose={() => {
-          setBarcodeReaderDemo(false);
-        }}
-      >
-        <DialogTitle sx={{ textAlign: "center" }}>
-          ¡Escanea para probar que funciona!
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText
+    <Box
+      component="main"
+      sx={{
+        position: "fixed",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#eeeeeeb0",
+      }}
+    >
+      {inicializate ? (
+        <>
+          <Container
+            component={Paper}
             sx={{
-              textAlign: "center",
-              color: "red",
-              textTransform: "uppercase",
+              width: "95%",
+              height: "90%",
             }}
           >
-            {BarcodeReader.data}
-          </DialogContentText>
-          <DialogActions>
-            <Button
-              variant="contained"
-              sx={{ marginBottom: "-15px" }}
-              onClick={() => {
-                BarcodeReader.clear();
-                setBarcodeReaderDemo(false);
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingTop: "5px",
               }}
             >
-              Cerrar
-            </Button>
-          </DialogActions>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
+              <Typography variant="h6">
+                Configuración de la terminal de trabajo
+              </Typography>
+              <Button variant="contained" onClick={handleExitConfigMode}>
+                Terminar y reiniciar
+              </Button>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "center",
+                marginY: "15px",
+              }}
+            ></Box>
+            {Loading && <LinearProgress />}
 
-/*      {/* <TableBody>
-            {Object.keys(SecureBrowser.Configs.Peripherals).map((key) =>
-              SecureBrowser.Info.Properties.Peripherals.map(
-                (subKey) =>
-                  SecureBrowser.Configs.Peripherals[key] !== subKey.ID && (
-                    <TableRow>
+            <Box
+              sx={{
+                display: "flex",
+                paddingButtom: "10px",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                {Hardware.Configs.Name}
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 400 }}>
+                -- {Hardware.Configs.Profile} --
+              </Typography>
+            </Box>
+
+            <TableContainer
+              sx={{ width: "100%", height: "75%", overflow: "auto" }}
+            >
+              <Table size="small" stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Dispositivos</TableCell>
+                    {Object.keys(Hardware.Configs.Peripherals).map(
+                      (name, idx) => {
+                        if (Hardware.Device[name]) {
+                          return (
+                            <TableCell key={idx} sx={{ textAlign: "center" }}>
+                              <Typography xs={{ fontSize: "1" }}>
+                                {Hardware.Configs.Peripherals[name].Name}
+                              </Typography>
+                              <HardwareButton
+                                name={name}
+                                label={Hardware.Device[name].name()}
+                                driver={
+                                  Hardware.Configs.Peripherals[name].Driver
+                                }
+                                disabled={iconIsDisabled[name]}
+                                status={deviceStatus[name]}
+                                onClick={() => {
+                                  console.log(
+                                    "NAME",
+                                    Hardware.Configs.Peripherals[name]
+                                  );
+                                  if (!Hardware.Device[name].status()) {
+                                    Hardware.Device[name]
+                                      .connect(
+                                        Hardware.Configs.Peripherals[name]
+                                          .Filter
+                                      )
+                                      .then((res) => {
+                                        if (Hardware.Device[name].status()) {
+                                          setDeviceStatus((p) => ({
+                                            ...p,
+                                            [Hardware.Configs.Peripherals[name]
+                                              .Driver]:
+                                              Hardware.Device[name].status(),
+                                          }));
+                                          Hardware.Device[
+                                            name
+                                          ].statusChangedListener(() => {
+                                            setDeviceStatus((p) => ({
+                                              ...p,
+                                              [Hardware.Configs.Peripherals[
+                                                name
+                                              ]]:
+                                                Hardware.Device[name].status(),
+                                            }));
+                                          });
+
+                                          if (
+                                            Hardware.Device[name].onDataListener
+                                          ) {
+                                            listenersRef[
+                                              Hardware.Configs.Peripherals[name]
+                                            ] = Hardware.Device[
+                                              name
+                                            ].onDataListener((data) => {
+                                              setScannerDemoData(data);
+                                            });
+                                          }
+                                        }
+                                      })
+                                      .catch((err) => {
+                                        console.log(err, "ERR");
+                                      });
+                                  }
+                                  switch (
+                                    Hardware.Configs.Peripherals[name].Driver
+                                  ) {
+                                    case "BarcodeScanner":
+                                      setBarcodeReaderDemo(
+                                        Hardware.Device[name]
+                                      );
+                                      break;
+                                    case "Camera":
+                                      if (
+                                        Hardware.Device.BarcodeScanner.status()
+                                      ) {
+                                        setCameraDemoOpen(true);
+                                        setCurrentCameraConstraints(
+                                          Hardware.Device[
+                                            name
+                                          ].videoConstraints()
+                                        );
+                                      }
+                                      break;
+                                    default:
+                                      Hardware.Device[name].demo(
+                                        Hardware.Configs.Peripherals[name].Name
+                                      );
+                                  }
+                                }}
+                              />
+                            </TableCell>
+                          );
+                        } else {
+                          return false;
+                        }
+                      }
+                    )}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Peripherals.map((peripheral, idx) => (
+                    <TableRow key={idx}>
                       <TableCell
                         sx={{
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           fontSize: "10px",
                           lineHeight: "1px",
+                          width: "250px !important",
                         }}
                       >
-                        <Typography>
-                          {SecureBrowser.Configs.Peripherals[key]}
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            color: "black",
+                            textDecoration: "uppercase",
+                          }}
+                        >
+                          {peripheral.ID}
                         </Typography>
+                        <Typography
+                          sx={{
+                            fontWeight: 300,
+                            color: "black",
+                          }}
+                        >
+                          {peripheral.Name && peripheral.Name}
+                        </Typography>
+                        <Typography>{peripheral.Manufacturer}</Typography>
+                        <Typography>{peripheral.Product}</Typography>
                       </TableCell>
-                      <TableCell>
-                        <Checkbox
-                          color="primary"
-                          // checked={checkboxStates[device.ID] === "Camera"}
-                          // onClick={() => {
-                          //   handleCheckboxClick(device, "Camera");
-                          // }}
-                        />
-                      </TableCell>
+                      {Object.keys(Hardware.Configs.Peripherals).map((name) => {
+                        if (Hardware.Device[name]) {
+                          return (
+                            <TableCell align="center" key={idx + name}>
+                              <Checkbox
+                                color="primary"
+                                checked={
+                                  checkboxChecked[name] === peripheral.ID
+                                }
+                                onClick={() => {
+                                  handleCheckboxClick({
+                                    peripheralID: peripheral.ID,
+                                    driverName: name,
+                                  });
+                                  handleInformationDB({
+                                    peripheralID: peripheral.ID,
+                                    driverName: name,
+                                  });
+                                }}
+                              />
+                            </TableCell>
+                          );
+                        } else {
+                          return false;
+                        }
+                      })}
                     </TableRow>
-                  )
-              )
-            )}
-          </TableBody>
-                      <TableBody> */
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Container>
+          <Dialog
+            open={barcodeReaderDemo && Hardware.Device.BarcodeScanner.status()}
+          >
+            <DialogTitle sx={{ textAlign: "center" }}>
+              ¡Escanea para probar que funciona!
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText
+                sx={{
+                  textAlign: "center",
+                  color: "red",
+                  textTransform: "uppercase",
+                }}
+              >
+                {scannerDemoData}
+              </DialogContentText>
+              <DialogActions>
+                <Button
+                  variant="contained"
+                  sx={{ marginBottom: "-15px" }}
+                  onClick={() => {
+                    setBarcodeReaderDemo(false);
+                    setScannerDemoData("");
+                  }}
+                >
+                  Cerrar
+                </Button>
+              </DialogActions>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={cameraDemoOpen}>
+            <DialogContent>
+              <DialogContentText
+                sx={{
+                  textAlign: "center",
+                  color: "red",
+                  textTransform: "uppercase",
+                }}
+              >
+                <Webcam
+                  audio={false}
+                  height={72}
+                  width={128}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={currentCameraConstraints}
+                />
+              </DialogContentText>
+              <DialogActions>
+                <Button
+                  variant="contained"
+                  sx={{ marginBottom: "-15px" }}
+                  onClick={() => {
+                    setCameraDemoOpen(false);
+                  }}
+                >
+                  Cerrar
+                </Button>
+              </DialogActions>
+            </DialogContent>
+          </Dialog>
+        </>
+      ) : (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+          <Button
+            variant="contained"
+            color="success"
+            sx={{ height: "10vh" }}
+            onClick={handleExitConfigMode}
+          >
+            Reiniciar terminal
+          </Button>
+          <Button variant="outlined" onClick={() => setInicializate(true)}>
+            Configurar perisfericos
+          </Button>
+        </Box>
+      )}
+    </Box>
+  );
+}
 
 export default Main;

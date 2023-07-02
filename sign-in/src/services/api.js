@@ -61,12 +61,14 @@ export const getSession = () => {
 };
 
 // @type: string[public|private]
-export const getSessionValue = (type, value) => {
+export const getSessionValue = (type, value, authorization) => {
   return fetch(`/api/session/v1/${type}/${value}`, {
     method: "GET",
     headers: {
       "content-type": "application/json charset=utf-8",
       "X-API-Key": API_KEY,
+      "Authorization": authorization
+    
     },
   })
     .then((resp) => {

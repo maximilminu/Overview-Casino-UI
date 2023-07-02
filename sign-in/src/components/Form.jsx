@@ -6,7 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useLayoutEffect, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import {  useLocation } from "react-router-dom";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -30,7 +30,6 @@ const Form = () => {
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false); // loading button
   const [disableSignInID, setDisableSignInID] = useState(false);
-
   const style = {
     inputField: {
       ".MuiInputBase-input.Mui-disabled": {
@@ -80,12 +79,23 @@ const Form = () => {
       setRefreshToken(refresh_token);
       setTokenType(token_type);
       try {
+        const token = await jwt_decode(access_token);
+        if(token && token.MustChangePassword){
+          window.location.href ="/new-password/reset-form"
+          return
+        }
         // TODO read from private value as well
-        const redirectUrl = await getSessionValue("public", "AfterLoginGoTo");
+        const redirectUrl = await getSessionValue("public", "AfterLoginGoTo", `${token_type} ${access_token}`);
         window.location.href = redirectUrl;
       } catch {
         // if an error occurs, redirect to '/'
-        window.location.href = "/";
+        try {
+          const decoded = jwt_decode(access_token);
+          window.location.href = decoded.Profile.DefaultUrlPath;
+        } catch {
+          //All failed
+          window.location.href = "/";
+        }
       }
     } catch (error) {
       if (error.message === "401") {
@@ -161,7 +171,7 @@ const Form = () => {
   }, []);
 
   return (
-    <form style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+    <form style={{ display: "flex", flexDirection: "column", gap: "15px", width:"100%" }}>
       <TextField
         {...register(`SignInId`, {
           required: true,
@@ -201,7 +211,7 @@ const Form = () => {
           },
         })}
         disabled={isLoading}
-        autoFocus={!disableSignInID}
+        // autoFocus={!disableSignInID}
         color="third"
         focused
         required
