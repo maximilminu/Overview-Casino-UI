@@ -4,31 +4,26 @@ import Router from "./Router";
 import { ApiProvider } from "@oc/api-context";
 import { NotifyUserProvider } from "@oc/notify-user-context";
 import { SnackbarProvider } from "notistack";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { HardwareProvider } from "@oc/hardware-context";
 import { ThemeProvider } from "@oc/theme-context";
 import { ConfigProvider } from "@oc/config-context";
 import UserProvider from "@oc/user-context";
-import "dayjs/locale/es-mx";
-import { CameraProvider } from "@oc/camera-context";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
 	<SnackbarProvider>
-		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es-mx">
-			<ApiProvider>
+		<ApiProvider>
+			<HardwareProvider>
 				<NotifyUserProvider>
-					<CameraProvider>
-						<ConfigProvider>
-							<ThemeProvider>
-								<UserProvider>
-									<Router />
-								</UserProvider>
-							</ThemeProvider>
-						</ConfigProvider>
-					</CameraProvider>
-				</NotifyUserProvider>
-			</ApiProvider>
-		</LocalizationProvider>
+					<ConfigProvider>
+						<ThemeProvider>
+							<UserProvider>
+								<Router />
+							</UserProvider>
+						</ThemeProvider>
+					</ConfigProvider>
+				</NotifyUserProvider>{" "}
+			</HardwareProvider>
+		</ApiProvider>
 	</SnackbarProvider>
 );

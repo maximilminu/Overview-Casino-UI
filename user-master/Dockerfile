@@ -3,9 +3,9 @@ FROM gitlab.sistematis.com.ar:4567/open-source/go/sims:latest
 ENV HEALTH=ok
 ENV PROMETHEUS=1
 ENV SPA=1
-ENV BASE_URL=/user-master/
+ENV BASE_URL=/user-management/
 
-ENV NAME="user-master"
+ENV NAME="user-management"
 ARG VERSION
 ENV VERSION=$VERSION
 

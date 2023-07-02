@@ -1,81 +1,92 @@
 {
-  "type": "object",
-  "properties": {
-    "Name": {
-      "title": "Nombre",
-      "type": "string",
-      "minLength": 3
-    },
-    "Lastname": {
-      "title": "Apellido",
-      "type": "string",
-      "minLength": 3
-    },
-    "Birthdate": {
-      "title": "Fecha de nacimiento",
-      "type": "string"
-    },
-    "LegalID": {
-      "title": "DNI",
-      "type": "string"
-    },
-    "Avatar": {
-      "title": "Avatar",
-      "type": "string",
-      "contentEncoding": "base64",
-      "contentMediaType": "image/jpeg"
-    },
-    "Area": {
-      "title": "Area",
-      "type": "string"
-    },
-    "Email": {
-      "title": "Email",
-      "type": "string",
-      "format": "email"
-    },
-    "ContactMethods": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "title": "Medios de contacto",
-        "label": "Medios de contacto",
-        "properties": {
-          "Type": {
-            "title": "Tipo",
-            "type": "string",
-            "enum": ["phone", "whatsapp", "telegram", "instagram", "messenger", "landphone"]
-          },
-          "Value": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "Country": {
-                    "type": "number"
-                  },
-                  "Region": {
-                    "type": "number"
-                  },
-                  "IsMobile": {
-                    "type": "boolean"
-                  },
-                  "Number": {
-                    "type": "number"
-                  }
-                }
-              },
-              {
-                "type": "string"
-              }
-            ]
-          },
-          "Description": {
-            "title": "Descripción",
-            "type": "string"
-          }
-        }
-      }
-    }
-  }
+	"type": "object",
+	"properties": {
+		"Name": {
+			"title": "Nombre",
+			"type": "string"
+		},
+		"Lastname": {
+			"title": "Apellido",
+			"type": "string"
+		},
+		"Birthdate": {
+			"title": "Fecha de nacimiento",
+			"type": "string"
+		},
+		"LegalID": {
+			"title": "DNI",
+			"type": "string"
+		},
+
+		"Email": {
+			"title": "Email",
+			"type": "string",
+			"format": "email"
+		},
+		"Role": {
+			"type": "string",
+			"oneOf": [],
+			"enum": []
+		},
+		"MultipleTerminalAccess": {
+			"type": "boolean",
+			"title": "Acceso a múltiples terminales",
+			"default": false
+		},
+
+		"SignInID": {
+			"title": "SignInID",
+			"type": "string"
+		},
+		"ContactMethods": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"title": "Medios de contacto",
+				"label": "Medios de contacto",
+				"properties": {
+					"Type": {
+						"title": "Tipo",
+						"type": "string",
+						"enum": [
+							"phone",
+							"whatsapp",
+							"telegram",
+							"instagram",
+							"messenger",
+							"landphone"
+						]
+					},
+					"Value": {
+						"oneOf": [
+							{
+								"type": "object",
+								"properties": {
+									"Country": {
+										"type": "number"
+									},
+									"Region": {
+										"type": "number"
+									},
+									"IsMobile": {
+										"type": "boolean"
+									},
+									"Number": {
+										"type": "number"
+									}
+								}
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"Description": {
+						"title": "Descripción",
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
 }
